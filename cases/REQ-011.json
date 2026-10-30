@@ -8,59 +8,49 @@
       "layer": "UI",
       "priority": "Moyenne",
       "preconditions": [
-        "L'administrateur est connecté via l'interface UI et possède le cookie token valide"
+        "L'administrateur n'est pas connecté"
       ],
       "steps": [
         {
-          "action": "Cliquer sur le bouton 'Déconnexion' dans le menu admin",
-          "expected": "L'utilisateur est redirigé vers la page de connexion et le cookie token est supprimé"
+          "action": "Appeler POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
+          "expected": "Réponse 200 avec un JSON contenant le champ \"token\""
         },
         {
-          "action": "Accéder directement à une URL de l'espace admin (ex: /admin/dashboard)",
-          "expected": "L'accès est refusé et l'utilisateur est redirigé vers la page de connexion"
+          "action": "Stocker le token reçu dans le cookie `token` du navigateur (simuler la connexion UI)",
+          "expected": "Le cookie `token` est présent avec la valeur du token"
+        },
+        {
+          "action": "Effectuer l'action de déconnexion dans l'UI (ex. cliquer sur le bouton Déconnexion) qui supprime le cookie `token`",
+          "expected": "Le cookie `token` est supprimé du navigateur"
+        },
+        {
+          "action": "Appeler GET /api/message sans le cookie `token`",
+          "expected": "Réponse 401 (ou 403) indiquant que le jeton n'est plus accepté"
         }
       ]
     },
     {
       "id": "TC-011-02",
       "requirement_id": "REQ-011",
-      "title": "Tentative de déconnexion alors que l'utilisateur n'est pas connecté",
+      "title": "Tentative de déconnexion alors que l'administrateur n'est pas connecté",
       "type": "negative",
       "layer": "UI",
       "priority": "Moyenne",
       "preconditions": [
-        "Aucun utilisateur n'est connecté, aucun cookie token présent"
+        "Aucun cookie `token` présent dans le navigateur"
       ],
       "steps": [
         {
-          "action": "Cliquer sur le bouton 'Déconnexion' (ou accéder à l'URL de déconnexion) depuis la page publique",
-          "expected": "Aucun changement d'état, l'utilisateur reste sur la page actuelle et un message d'erreur 'Déconnexion impossible, utilisateur non authentifié' s'affiche"
-        }
-      ]
-    },
-    {
-      "id": "TC-011-03",
-      "requirement_id": "REQ-011",
-      "title": "Le jeton n'est plus accepté par l'API après déconnexion",
-      "type": "negative",
-      "layer": "API",
-      "priority": "Moyenne",
-      "preconditions": [
-        "L'administrateur s'est connecté via /api/auth/login et a reçu le cookie token",
-        "Le token est stocké pour les appels API"
-      ],
-      "steps": [
-        {
-          "action": "Effectuer une requête GET vers un endpoint protégé de l'API (ex: /api/admin/users) en incluant le cookie token",
-          "expected": "Réponse 200, données accessibles"
+          "action": "Cliquer sur le bouton Déconnexion de l'UI sans être connecté",
+          "expected": "L'UI ne génère aucune erreur et indique que l'utilisateur n'est pas connecté"
         },
         {
-          "action": "Cliquer sur le bouton 'Déconnexion' dans l'UI admin",
-          "expected": "Le token est invalidé"
+          "action": "Vérifier qu'aucun cookie `token` n'est créé",
+          "expected": "Le cookie `token` reste absent"
         },
         {
-          "action": "Répéter la même requête GET vers /api/admin/users avec le même cookie token",
-          "expected": "Réponse 401 Unauthorized, le token n'est plus accepté"
+          "action": "Appeler GET /api/message sans le cookie `token`",
+          "expected": "Réponse 401 (ou 403) confirmant que l'accès à l'espace admin est refusé"
         }
       ]
     }

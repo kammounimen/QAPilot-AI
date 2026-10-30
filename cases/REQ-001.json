@@ -3,53 +3,72 @@
     {
       "id": "TC-001-01",
       "requirement_id": "REQ-001",
-      "title": "Connexion administrateur avec identifiants valides",
+      "title": "Connexion administrateur valide via API",
       "type": "nominal",
       "layer": "API",
       "priority": "Haute",
       "preconditions": [
-        "Le serveur API est disponible",
-        "Un compte administrateur existe avec username \"admin\" et password \"password\""
+        "Aucun"
       ],
       "steps": [
         {
           "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse HTTP 200 et cookie \"token\" présent"
+          "expected": "Réponse 200 avec un JSON contenant la clé \"token\""
+        },
+        {
+          "action": "Envoyer une requête GET /api/message en incluant le cookie token=<valeur du token reçu>",
+          "expected": "Réponse 200 avec un tableau \"messages\" contenant le message initial"
         }
       ]
     },
     {
       "id": "TC-001-02",
       "requirement_id": "REQ-001",
-      "title": "Connexion administrateur avec mot de passe incorrect",
+      "title": "Connexion administrateur avec mot de passe incorrect via API",
       "type": "negative",
       "layer": "API",
       "priority": "Haute",
       "preconditions": [
-        "Le serveur API est disponible",
-        "Un compte administrateur existe avec username \"admin\" et password \"password\""
+        "Aucun"
       ],
       "steps": [
         {
           "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"wrongpass\"}",
-          "expected": "Réponse HTTP 401 et message d'erreur d'authentification"
+          "expected": "Réponse 401 avec le JSON {\"error\":\"Invalid credentials\"}"
         }
       ]
     },
     {
       "id": "TC-001-03",
       "requirement_id": "REQ-001",
-      "title": "Connexion administrateur avec champs vides",
+      "title": "Connexion administrateur avec champs vides via UI",
+      "type": "negative",
+      "layer": "UI",
+      "priority": "Haute",
+      "preconditions": [
+        "L'utilisateur est sur la page de connexion admin"
+      ],
+      "steps": [
+        {
+          "action": "Laisser les champs \"Nom d'utilisateur\" et \"Mot de passe\" vides et cliquer sur le bouton \"Se connecter\"",
+          "expected": "Un message d'erreur s'affiche indiquant que les champs sont obligatoires"
+        }
+      ]
+    },
+    {
+      "id": "TC-001-04",
+      "requirement_id": "REQ-001",
+      "title": "Connexion administrateur avec corps JSON invalide via API",
       "type": "negative",
       "layer": "API",
       "priority": "Haute",
       "preconditions": [
-        "Le serveur API est disponible"
+        "Aucun"
       ],
       "steps": [
         {
-          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"\",\"password\":\"\"}",
-          "expected": "Réponse HTTP 401 et message d'erreur indiquant que les champs sont requis"
+          "action": "Envoyer une requête POST /api/auth/login avec un corps JSON mal formé (ex: \"{username:admin,password:password}\")",
+          "expected": "Réponse 500 indiquant une erreur serveur (voir DEF-001)"
         }
       ]
     }

@@ -8,131 +8,69 @@
       "layer": "UI",
       "priority": "Haute",
       "preconditions": [
-        "Le visiteur est sur la page de formulaire de contact"
+        "L'utilisateur accède à la page de formulaire de contact"
       ],
       "steps": [
         {
-          "action": "Saisir \"Jean Dupont\" dans le champ Nom",
-          "expected": "Le champ Nom contient \"Jean Dupont\""
+          "action": "Saisir un nom valide dans le champ 'Nom'",
+          "expected": "Le champ accepte le texte saisi"
         },
         {
-          "action": "Saisir \"jean.dupont@example.com\" dans le champ Email",
-          "expected": "Le champ Email contient \"jean.dupont@example.com\""
+          "action": "Saisir une adresse email valide dans le champ 'Email'",
+          "expected": "Le champ accepte le texte saisi"
         },
         {
-          "action": "Saisir \"0123456789\" dans le champ Téléphone",
-          "expected": "Le champ Téléphone contient \"0123456789\""
+          "action": "Saisir un numéro de téléphone valide dans le champ 'Téléphone'",
+          "expected": "Le champ accepte le texte saisi"
         },
         {
-          "action": "Saisir \"Demande d'information\" dans le champ Sujet",
-          "expected": "Le champ Sujet contient \"Demande d'information\""
+          "action": "Saisir un sujet valide dans le champ 'Sujet'",
+          "expected": "Le champ accepte le texte saisi"
         },
         {
-          "action": "Saisir \"Bonjour, je souhaite en savoir plus sur vos services.\" dans le champ Message",
-          "expected": "Le champ Message contient le texte saisi"
+          "action": "Saisir un message valide dans le champ 'Message'",
+          "expected": "Le champ accepte le texte saisi"
         },
         {
-          "action": "Cliquer sur le bouton \"Envoyer\"",
-          "expected": "Une confirmation \"Votre message a été envoyé avec succès\" s'affiche"
+          "action": "Cliquer sur le bouton 'Envoyer'",
+          "expected": "Une confirmation s'affiche indiquant que le message a été envoyé avec succès"
         }
       ]
     },
     {
       "id": "TC-008-02",
       "requirement_id": "REQ-008",
-      "title": "Tentative d'envoi sans champ Email",
+      "title": "Tentative d'envoi de message avec email invalide",
       "type": "negative",
       "layer": "UI",
       "priority": "Haute",
       "preconditions": [
-        "Le visiteur est sur la page de formulaire de contact"
+        "L'utilisateur accède à la page de formulaire de contact"
       ],
       "steps": [
         {
-          "action": "Saisir \"Marie Curie\" dans le champ Nom",
-          "expected": "Le champ Nom contient \"Marie Curie\""
+          "action": "Saisir un nom valide dans le champ 'Nom'",
+          "expected": "Le champ accepte le texte saisi"
         },
         {
-          "action": "Laisser le champ Email vide",
-          "expected": "Le champ Email reste vide"
+          "action": "Saisir une adresse email invalide (ex: 'user@@example') dans le champ 'Email'",
+          "expected": "Le champ signale une erreur de format d'email"
         },
         {
-          "action": "Saisir \"0987654321\" dans le champ Téléphone",
-          "expected": "Le champ Téléphone contient \"0987654321\""
+          "action": "Saisir un numéro de téléphone valide dans le champ 'Téléphone'",
+          "expected": "Le champ accepte le texte saisi"
         },
         {
-          "action": "Saisir \"Support\" dans le champ Sujet",
-          "expected": "Le champ Sujet contient \"Support\""
+          "action": "Saisir un sujet valide dans le champ 'Sujet'",
+          "expected": "Le champ accepte le texte saisi"
         },
         {
-          "action": "Saisir \"Besoin d'aide\" dans le champ Message",
-          "expected": "Le champ Message contient le texte saisi"
+          "action": "Saisir un message valide dans le champ 'Message'",
+          "expected": "Le champ accepte le texte saisé"
         },
         {
-          "action": "Cliquer sur le bouton \"Envoyer\"",
-          "expected": "Un message d'erreur \"L'email est obligatoire\" s'affiche"
-        }
-      ]
-    },
-    {
-      "id": "TC-008-03",
-      "requirement_id": "REQ-008",
-      "title": "Envoi avec email au format invalide",
-      "type": "negative",
-      "layer": "UI",
-      "priority": "Haute",
-      "preconditions": [
-        "Le visiteur est sur la page de formulaire de contact"
-      ],
-      "steps": [
-        {
-          "action": "Saisir \"Paul Martin\" dans le champ Nom",
-          "expected": "Le champ Nom contient \"Paul Martin\""
-        },
-        {
-          "action": "Saisir \"paul.martin[at]example.com\" dans le champ Email",
-          "expected": "Le champ Email contient \"paul.martin[at]example.com\""
-        },
-        {
-          "action": "Saisir \"0147258369\" dans le champ Téléphone",
-          "expected": "Le champ Téléphone contient \"0147258369\""
-        },
-        {
-          "action": "Saisir \"Réclamation\" dans le champ Sujet",
-          "expected": "Le champ Sujet contient \"Réclamation\""
-        },
-        {
-          "action": "Saisir \"Message invalide\" dans le champ Message",
-          "expected": "Le champ Message contient le texte saisi"
-        },
-        {
-          "action": "Cliquer sur le bouton \"Envoyer\"",
-          "expected": "Un message d'erreur \"Le format de l'email est invalide\" s'affiche"
-        }
-      ]
-    },
-    {
-      "id": "TC-008-04",
-      "requirement_id": "REQ-008",
-      "title": "Envoi de message après authentification via API",
-      "type": "nominal",
-      "layer": "API",
-      "priority": "Haute",
-      "preconditions": [
-        "L'utilisateur admin est authentifié via POST /api/auth/login et le cookie token est présent"
-      ],
-      "steps": [
-        {
-          "action": "Effectuer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse 200 et cookie `token` reçu"
-        },
-        {
-          "action": "Naviguer vers la page de contact en conservant le cookie `token`",
-          "expected": "La page de contact s'affiche"
-        },
-        {
-          "action": "Remplir le formulaire avec des données valides et soumettre",
-          "expected": "Réponse 200 et message de confirmation \"Votre message a été envoyé avec succès\""
+          "action": "Cliquer sur le bouton 'Envoyer'",
+          "expected": "Aucun message de confirmation n'est affiché ; un message d'erreur indique que l'email est invalide"
         }
       ]
     }

@@ -3,66 +3,54 @@
     {
       "id": "TC-002-01",
       "requirement_id": "REQ-002",
-      "title": "Authentification réussie via API",
+      "title": "Affichage nominal de la liste des chambres avec type, prix et bouton de réservation",
       "type": "nominal",
-      "layer": "API",
+      "layer": "UI",
       "priority": "Haute",
-      "preconditions": [],
+      "preconditions": [
+        "L'utilisateur a ouvert le navigateur et a accédé à la page d'accueil du site."
+      ],
       "steps": [
         {
-          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse 200 et cookie `token` présent"
+          "action": "Charger la page d'accueil",
+          "expected": "La liste des chambres disponibles s'affiche."
+        },
+        {
+          "action": "Pour chaque chambre affichée, vérifier la présence du champ \"type\"",
+          "expected": "Le type de la chambre est visible pour chaque entrée."
+        },
+        {
+          "action": "Pour chaque chambre affichée, vérifier la présence du champ \"prix\"",
+          "expected": "Le prix de la chambre est visible pour chaque entrée."
+        },
+        {
+          "action": "Pour chaque chambre affichée, vérifier la présence d'un bouton \"Réserver\"",
+          "expected": "Un bouton de réservation est présent et cliquable pour chaque chambre."
         }
       ]
     },
     {
       "id": "TC-002-02",
       "requirement_id": "REQ-002",
-      "title": "Échec d'authentification avec identifiants invalides",
+      "title": "Absence du prix pour une chambre (cas négatif)",
       "type": "negative",
-      "layer": "API",
-      "priority": "Haute",
-      "preconditions": [],
-      "steps": [
-        {
-          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"wrong\"}",
-          "expected": "Réponse 401 Unauthorized, aucun cookie `token`"
-        }
-      ]
-    },
-    {
-      "id": "TC-002-03",
-      "requirement_id": "REQ-002",
-      "title": "Affichage de la liste des chambres après connexion",
-      "type": "nominal",
       "layer": "UI",
       "priority": "Haute",
       "preconditions": [
-        "Authentification réussie (voir TC-001)"
+        "L'utilisateur a ouvert le navigateur et a accédé à la page d'accueil du site où une chambre a été configurée sans prix dans la base de données."
       ],
       "steps": [
         {
-          "action": "Naviguer vers la page d'accueil après réception du cookie `token`",
-          "expected": "La page affiche une liste de chambres où chaque élément montre le type de la chambre et le prix"
+          "action": "Charger la page d'accueil",
+          "expected": "La liste des chambres s'affiche."
         },
         {
-          "action": "Vérifier la présence d'un bouton 'Réserver' pour chaque chambre",
-          "expected": "Chaque chambre possède un bouton de réservation cliquable"
-        }
-      ]
-    },
-    {
-      "id": "TC-002-04",
-      "requirement_id": "REQ-002",
-      "title": "Accès à la page d'accueil sans authentification",
-      "type": "negative",
-      "layer": "UI",
-      "priority": "Haute",
-      "preconditions": [],
-      "steps": [
+          "action": "Identifier la chambre dont le prix est manquant",
+          "expected": "Le champ \"prix\" n'est pas présent pour cette chambre."
+        },
         {
-          "action": "Ouvrir la page d'accueil sans fournir le cookie `token`",
-          "expected": "Redirection vers la page de connexion ou affichage d'un message d'erreur, aucune liste de chambres n'est visible"
+          "action": "Vérifier que le système signale une anomalie ou masque la chambre",
+          "expected": "Un message d'erreur ou une indication de donnée manquante est affiché, ou la chambre n'est pas présentée dans la liste."
         }
       ]
     }

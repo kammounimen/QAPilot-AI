@@ -3,76 +3,30 @@
     {
       "id": "TC-004-01",
       "requirement_id": "REQ-004",
-      "title": "Modification du prix d'une chambre avec des données valides",
+      "title": "Connexion administrateur avec identifiants valides",
       "type": "nominal",
-      "layer": "UI",
+      "layer": "API",
       "priority": "Moyenne",
-      "preconditions": [
-        "L'administrateur est enregistré dans le système",
-        "L'administrateur possède les identifiants {\"username\":\"admin\",\"password\":\"password\"}"
-      ],
+      "preconditions": [],
       "steps": [
         {
-          "action": "Appeler POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse 200 et cookie `token` reçu"
-        },
-        {
-          "action": "Ouvrir la page d'accueil de l'application UI avec le cookie `token`",
-          "expected": "L'administrateur est authentifié et voit la liste des chambres"
-        },
-        {
-          "action": "Cliquer sur le bouton \"Modifier\" d'une chambre existante",
-          "expected": "Le formulaire de modification de la chambre s'affiche"
-        },
-        {
-          "action": "Modifier le champ \"prix\" avec la valeur 150",
-          "expected": "Le champ accepte la nouvelle valeur"
-        },
-        {
-          "action": "Cliquer sur le bouton \"Enregistrer\"",
-          "expected": "Un message de succès s'affiche et la modification est enregistrée"
-        },
-        {
-          "action": "Retourner à la page d'accueil et vérifier le prix de la chambre modifiée",
-          "expected": "Le prix affiché est bien 150"
+          "action": "POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
+          "expected": "Réponse 200 et JSON contenant le champ \"token\" avec une chaîne non vide"
         }
       ]
     },
     {
       "id": "TC-004-02",
       "requirement_id": "REQ-004",
-      "title": "Refus de modification avec un prix invalide",
+      "title": "Connexion administrateur avec mot de passe invalide",
       "type": "negative",
-      "layer": "UI",
+      "layer": "API",
       "priority": "Moyenne",
-      "preconditions": [
-        "L'administrateur est enregistré dans le système",
-        "L'administrateur possède les identifiants {\"username\":\"admin\",\"password\":\"password\"}"
-      ],
+      "preconditions": [],
       "steps": [
         {
-          "action": "Appeler POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse 200 et cookie `token` reçu"
-        },
-        {
-          "action": "Ouvrir la page d'accueil de l'application UI avec le cookie `token`",
-          "expected": "L'administrateur est authentifié et voit la liste des chambres"
-        },
-        {
-          "action": "Cliquer sur le bouton \"Modifier\" d'une chambre existante",
-          "expected": "Le formulaire de modification de la chambre s'affiche"
-        },
-        {
-          "action": "Modifier le champ \"prix\" avec la valeur -20",
-          "expected": "Le champ accepte la saisie mais la validation détecte une valeur invalide"
-        },
-        {
-          "action": "Cliquer sur le bouton \"Enregistrer\"",
-          "expected": "Un message d'erreur s'affiche indiquant que le prix est invalide et aucune modification n'est enregistrée"
-        },
-        {
-          "action": "Retourner à la page d'accueil et vérifier le prix de la chambre",
-          "expected": "Le prix affiché reste inchangé"
+          "action": "POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"wrong\"}",
+          "expected": "Réponse 401 et JSON {\"error\":\"Invalid credentials\"}"
         }
       ]
     }

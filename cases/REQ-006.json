@@ -3,34 +3,42 @@
     {
       "id": "TC-006-01",
       "requirement_id": "REQ-006",
-      "title": "Réservation réussie avec données valides",
+      "title": "Réservation valide avec toutes les informations correctes",
       "type": "nominal",
       "layer": "UI",
       "priority": "Haute",
       "preconditions": [
-        "L'utilisateur est sur la page de réservation",
-        "L'administrateur est authentifié via l'API"
+        "L'utilisateur accède à la page de réservation",
+        "Le formulaire de réservation est affiché"
       ],
       "steps": [
         {
-          "action": "POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse 200 et cookie token présent"
+          "action": "Saisir le prénom \"Jean\" dans le champ Prénom",
+          "expected": "Le champ Prénom contient \"Jean\""
         },
         {
-          "action": "Ouvrir la page de réservation du site",
-          "expected": "Le formulaire de réservation est affiché"
+          "action": "Saisir le nom \"Dupont\" dans le champ Nom",
+          "expected": "Le champ Nom contient \"Dupont\""
         },
         {
-          "action": "Saisir le prénom \"Jean\", le nom \"Dupont\", l'email \"jean.dupont@example.com\", le téléphone \"0123456789\", la date d'arrivée \"2024-12-01\" et la date de départ \"2024-12-05\"",
-          "expected": "Les champs sont remplis correctement"
+          "action": "Saisir l'email \"jean.dupont@example.com\" dans le champ Email",
+          "expected": "Le champ Email contient \"jean.dupont@example.com\""
+        },
+        {
+          "action": "Saisir le téléphone \"0601020304\" dans le champ Téléphone",
+          "expected": "Le champ Téléphone contient \"0601020304\""
+        },
+        {
+          "action": "Sélectionner la date d'arrivée \"2024-12-01\" et la date de départ \"2024-12-05\"",
+          "expected": "Les dates sont affichées correctement et la date de départ est postérieure à la date d'arrivée"
         },
         {
           "action": "Cliquer sur le bouton \"Réserver\"",
-          "expected": "Message de confirmation \"Réservation confirmée\" affiché"
+          "expected": "Un message de confirmation s'affiche \"Réservation confirmée\""
         },
         {
-          "action": "Accéder au calendrier admin (UI)",
-          "expected": "La réservation apparaît dans le calendrier aux dates du 01/12/2024 au 05/12/2024"
+          "action": "Accéder à l'interface admin et ouvrir le calendrier",
+          "expected": "La réservation apparaît dans le calendrier aux dates 01/12/2024 - 05/12/2024"
         }
       ]
     },
@@ -42,29 +50,33 @@
       "layer": "UI",
       "priority": "Haute",
       "preconditions": [
-        "L'utilisateur est sur la page de réservation",
-        "L'administrateur est authentifié via l'API"
+        "L'utilisateur accède à la page de réservation",
+        "Le formulaire de réservation est affiché"
       ],
       "steps": [
         {
-          "action": "POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse 200 et cookie token présent"
+          "action": "Saisir le prénom \"Marie\" dans le champ Prénom",
+          "expected": "Le champ Prénom contient \"Marie\""
         },
         {
-          "action": "Ouvrir la page de réservation du site",
-          "expected": "Le formulaire de réservation est affiché"
+          "action": "Saisir le nom \"Lefevre\" dans le champ Nom",
+          "expected": "Le champ Nom contient \"Lefevre\""
         },
         {
-          "action": "Saisir le prénom \"Marie\", le nom \"Leroy\", l'email \"marie.leroy@example.com\", le téléphone \"0987654321\", la date d'arrivée \"2024-12-10\" et la date de départ \"2024-12-08\"",
-          "expected": "Les champs sont remplis, mais la date de départ est antérieure à la date d'arrivée"
+          "action": "Saisir l'email \"marie.lefevre@example.com\" dans le champ Email",
+          "expected": "Le champ Email contient \"marie.lefevre@example.com\""
+        },
+        {
+          "action": "Saisir le téléphone \"0611223344\" dans le champ Téléphone",
+          "expected": "Le champ Téléphone contient \"0611223344\""
+        },
+        {
+          "action": "Sélectionner la date d'arrivée \"2024-12-10\" et la date de départ \"2024-12-08\"",
+          "expected": "Le champ date de départ indique une date antérieure à la date d'arrivée"
         },
         {
           "action": "Cliquer sur le bouton \"Réserver\"",
-          "expected": "Message d'erreur \"La date de départ doit être postérieure à la date d'arrivée\" affiché et aucune réservation n'est créée"
-        },
-        {
-          "action": "Vérifier le calendrier admin (UI)",
-          "expected": "Aucune nouvelle entrée n'apparaît aux dates du 08/12/2024 au 10/12/2024"
+          "expected": "Un message d'erreur s'affiche \"La date de départ doit être postérieure à la date d'arrivée\" et la réservation n'est pas créée"
         }
       ]
     }

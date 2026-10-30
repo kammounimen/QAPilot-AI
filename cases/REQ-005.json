@@ -3,54 +3,103 @@
     {
       "id": "TC-005-01",
       "requirement_id": "REQ-005",
-      "title": "Suppression d'une chambre existante (cas nominal)",
+      "title": "Suppression d'une chambre existante - scénario nominal",
       "type": "nominal",
       "layer": "UI",
       "priority": "Moyenne",
       "preconditions": [
-        "L'administrateur est connecté à l'application."
+        "L'administrateur est connecté à l'interface admin",
+        "Une chambre avec l'identifiant 101 est présente dans la liste des chambres"
       ],
       "steps": [
         {
-          "action": "Se rendre sur la page d'administration des chambres.",
-          "expected": "La liste des chambres s'affiche."
+          "action": "Naviguer vers la page d'administration des chambres",
+          "expected": "La liste des chambres s'affiche avec la chambre 101 visible"
         },
         {
-          "action": "Cliquer sur le bouton \"Supprimer\" de la chambre avec l'ID 123.",
-          "expected": "Une boîte de confirmation apparaît."
+          "action": "Cliquer sur le bouton \"Supprimer\" associé à la chambre 101",
+          "expected": "Une boîte de dialogue de confirmation apparaît"
         },
         {
-          "action": "Confirmer la suppression.",
-          "expected": "Le serveur répond avec un statut 200 et la chambre disparaît de la liste."
+          "action": "Confirmer la suppression",
+          "expected": "Un appel API de suppression est effectué et renvoie un statut 200"
         },
         {
-          "action": "Actualiser la page d'accueil.",
-          "expected": "La chambre supprimée n'est plus visible sur la page d'accueil."
+          "action": "Vérifier que la chambre 101 n'apparaît plus dans la liste admin",
+          "expected": "La chambre 101 a disparu de la liste"
+        },
+        {
+          "action": "Accéder à la page d'accueil du site",
+          "expected": "La chambre 101 n'est plus affichée parmi les chambres disponibles"
         }
       ]
     },
     {
       "id": "TC-005-02",
       "requirement_id": "REQ-005",
-      "title": "Tentative de suppression d'une chambre inexistante (cas négatif)",
+      "title": "Tentative de suppression d'une chambre inexistante - scénario négatif",
       "type": "negative",
       "layer": "UI",
       "priority": "Moyenne",
       "preconditions": [
-        "L'administrateur est connecté à l'application."
+        "L'administrateur est connecté à l'interface admin"
       ],
       "steps": [
         {
-          "action": "Se rendre sur la page d'administration des chambres.",
-          "expected": "La liste des chambres s'affiche."
+          "action": "Naviguer vers la page d'administration des chambres",
+          "expected": "La liste des chambres s'affiche"
         },
         {
-          "action": "Tenter de supprimer la chambre avec l'ID 9999 (inexistant) via l'URL ou le bouton.",
-          "expected": "Le serveur répond avec un statut 404 ou 400, aucune erreur 500 n'est renvoyée."
+          "action": "Saisir un identifiant de chambre inexistant (ex: 9999) dans le champ de recherche et cliquer sur \"Supprimer\"",
+          "expected": "L'application envoie une requête de suppression pour la chambre 9999"
         },
         {
-          "action": "Vérifier que la liste des chambres reste inchangée.",
-          "expected": "Aucune modification de la liste, aucune erreur serveur affichée."
+          "action": "Observer la réponse du serveur",
+          "expected": "Le serveur renvoie un statut 404 ou 200 avec message \"Chambre non trouvée\", mais aucune erreur 500 n'est générée"
+        },
+        {
+          "action": "Vérifier que la liste des chambres reste inchangée",
+          "expected": "Aucune chambre n'est retirée de la liste"
+        }
+      ]
+    },
+    {
+      "id": "TC-005-03",
+      "requirement_id": "REQ-005",
+      "title": "Suppression d'une chambre après authentification via API",
+      "type": "nominal",
+      "layer": "API",
+      "priority": "Moyenne",
+      "preconditions": [
+        "Une chambre avec l'identifiant 202 existe dans la base de données"
+      ],
+      "steps": [
+        {
+          "action": "Appeler POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
+          "expected": "Réponse 200 avec un token valide"
+        },
+        {
+          "action": "Utiliser le token reçu dans le cookie \"token\" pour appeler l'endpoint de suppression de chambre (ex: DELETE /api/rooms/202)",
+          "expected": "Réponse 200 indiquant la suppression réussie (même si l'endpoint n'est pas documenté, on suppose son existence pour le test)"
+        }
+      ]
+    },
+    {
+      "id": "TC-005-04",
+      "requirement_id": "REQ-005",
+      "title": "Suppression d'une chambre inexistante via API - scénario négatif",
+      "type": "negative",
+      "layer": "API",
+      "priority": "Moyenne",
+      "preconditions": [],
+      "steps": [
+        {
+          "action": "Appeler POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
+          "expected": "Réponse 200 avec un token valide"
+        },
+        {
+          "action": "Utiliser le token pour appeler DELETE /api/rooms/9999 (chambre inexistante)",
+          "expected": "Réponse 404 ou 200 avec message d'erreur, mais aucune réponse 500"
         }
       ]
     }

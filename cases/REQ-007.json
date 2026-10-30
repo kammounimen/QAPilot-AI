@@ -3,30 +3,113 @@
     {
       "id": "TC-007-01",
       "requirement_id": "REQ-007",
-      "title": "Authentification réussie avec des identifiants valides",
+      "title": "Réservation valide - succès",
       "type": "nominal",
-      "layer": "API",
+      "layer": "UI",
       "priority": "Haute",
-      "preconditions": [],
+      "preconditions": [
+        "L'utilisateur s'est authentifié via POST /api/auth/login avec des identifiants valides et possède le cookie token"
+      ],
       "steps": [
         {
-          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse 200 et le cookie `token` présent"
+          "action": "Ouvrir la page de réservation pour la chambre 101",
+          "expected": "Le formulaire de réservation s'affiche"
+        },
+        {
+          "action": "Saisir un email valide \"client@example.com\"",
+          "expected": "Le champ email accepte la valeur"
+        },
+        {
+          "action": "Sélectionner une date d'arrivée future (ex: 2024-12-01) et une date de départ ultérieure (ex: 2024-12-05)",
+          "expected": "Les dates sont acceptées"
+        },
+        {
+          "action": "Cliquer sur le bouton \"Réserver\"",
+          "expected": "La réservation est acceptée et un message de confirmation s'affiche"
         }
       ]
     },
     {
       "id": "TC-007-02",
       "requirement_id": "REQ-007",
-      "title": "Authentification refusée avec champs obligatoires vides",
+      "title": "Réservation refusée - champs obligatoires vides",
       "type": "negative",
-      "layer": "API",
+      "layer": "UI",
       "priority": "Haute",
-      "preconditions": [],
+      "preconditions": [
+        "L'utilisateur s'est authentifié via POST /api/auth/login avec des identifiants valides et possède le cookie token"
+      ],
       "steps": [
         {
-          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"\",\"password\":\"\"}",
-          "expected": "Réponse 401 Unauthorized"
+          "action": "Ouvrir la page de réservation",
+          "expected": "Le formulaire s'affiche"
+        },
+        {
+          "action": "Laisser le champ email vide et remplir les autres champs correctement",
+          "expected": "Le champ email reste vide"
+        },
+        {
+          "action": "Cliquer sur \"Réserver\"",
+          "expected": "Un message d'erreur s'affiche indiquant que le champ email est obligatoire et la réservation est refusée"
+        }
+      ]
+    },
+    {
+      "id": "TC-007-03",
+      "requirement_id": "REQ-007",
+      "title": "Réservation refusée - conflit de dates pour la même chambre",
+      "type": "negative",
+      "layer": "UI",
+      "priority": "Haute",
+      "preconditions": [
+        "Une réservation existante pour la chambre 101 du 2024-12-10 au 2024-12-15 est déjà enregistrée",
+        "L'utilisateur s'est authentifié via POST /api/auth/login avec des identifiants valides et possède le cookie token"
+      ],
+      "steps": [
+        {
+          "action": "Ouvrir la page de réservation pour la chambre 101",
+          "expected": "Le formulaire s'affiche"
+        },
+        {
+          "action": "Saisir un email valide \"client2@example.com\"",
+          "expected": "Le champ email accepte la valeur"
+        },
+        {
+          "action": "Choisir comme dates d'arrivée le 2024-12-12 et date de départ le 2024-12-14 (période déjà réservée)",
+          "expected": "Les dates sont sélectionnées"
+        },
+        {
+          "action": "Cliquer sur \"Réserver\"",
+          "expected": "Un message d'erreur indique que les dates sont en conflit avec une réservation existante et la réservation est refusée"
+        }
+      ]
+    },
+    {
+      "id": "TC-007-04",
+      "requirement_id": "REQ-007",
+      "title": "Réservation refusée - date de départ antérieure à la date d'arrivée",
+      "type": "negative",
+      "layer": "UI",
+      "priority": "Haute",
+      "preconditions": [
+        "L'utilisateur s'est authentifié via POST /api/auth/login avec des identifiants valides et possède le cookie token"
+      ],
+      "steps": [
+        {
+          "action": "Ouvrir la page de réservation",
+          "expected": "Le formulaire s'affiche"
+        },
+        {
+          "action": "Saisir un email valide \"client3@example.com\"",
+          "expected": "Le champ email accepte la valeur"
+        },
+        {
+          "action": "Sélectionner une date d'arrivée le 2024-12-20 et une date de départ le 2024-12-18",
+          "expected": "Les dates sont sélectionnées"
+        },
+        {
+          "action": "Cliquer sur \"Réserver\"",
+          "expected": "Un message d'erreur indique que la date de départ ne peut pas être antérieure à la date d'arrivée et la réservation est refusée"
         }
       ]
     }

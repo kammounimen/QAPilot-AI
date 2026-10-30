@@ -3,45 +3,56 @@
     {
       "id": "TC-012-01",
       "requirement_id": "REQ-012",
-      "title": "Connexion réussie avec des identifiants valides",
+      "title": "Lecture des messages avec authentification valide",
       "type": "nominal",
       "layer": "API",
       "priority": "Haute",
-      "preconditions": [],
+      "preconditions": [
+        "Le serveur est disponible",
+        "Aucun token valide présent"
+      ],
       "steps": [
         {
           "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse 200 et le cookie 'token' présent"
+          "expected": "Réponse 200 contenant un champ \"token\""
+        },
+        {
+          "action": "Envoyer une requête GET /api/message avec le cookie token=<valeur du token reçu>",
+          "expected": "Réponse 200 avec un tableau \"messages\" contenant au moins le message initial"
         }
       ]
     },
     {
       "id": "TC-012-02",
       "requirement_id": "REQ-012",
-      "title": "Échec de connexion sans mot de passe",
+      "title": "Lecture des messages sans token",
       "type": "negative",
       "layer": "API",
       "priority": "Haute",
-      "preconditions": [],
+      "preconditions": [
+        "Le serveur est disponible"
+      ],
       "steps": [
         {
-          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\"} (mot de passe manquant)",
-          "expected": "Réponse 401 Unauthorized"
+          "action": "Envoyer une requête GET /api/message sans inclure le cookie token",
+          "expected": "Réponse 401 ou 403 indiquant l'absence d'authentification"
         }
       ]
     },
     {
       "id": "TC-012-03",
       "requirement_id": "REQ-012",
-      "title": "Échec de connexion avec mot de passe incorrect",
+      "title": "Lecture des messages avec token invalide",
       "type": "negative",
       "layer": "API",
       "priority": "Haute",
-      "preconditions": [],
+      "preconditions": [
+        "Le serveur est disponible"
+      ],
       "steps": [
         {
-          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"wrong\"}",
-          "expected": "Réponse 401 Unauthorized"
+          "action": "Envoyer une requête GET /api/message avec le cookie token=invalid_or_expired_token",
+          "expected": "Réponse 401 ou 403 indiquant que le token est invalide ou expiré"
         }
       ]
     }
