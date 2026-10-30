@@ -1,0 +1,32 @@
+[project]
+name = "qapilot-ai"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "imen kammoun", email = "imen.kammoun@enis.tn" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "groq>=1.7.0",
+    "pydantic>=2.14.2",
+    "pytest>=9.2.0",
+    "pytest-playwright>=0.10.0",
+    "python-dotenv>=1.2.4",
+    "requests>=2.34.2",
+    "ruff>=0.17.3",
+    "selenium>=4.52.0",
+]
+
+[project.scripts]
+qapilot-ai = "qapilot_ai:main"
+
+[build-system]
+requires = ["uv_build>=0.13.6,<0.14.0"]
+build-backend = "uv_build"
+[tool.pytest.ini_options]
+markers = ["tc(id): identifiant du cas de test (traçabilité)"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+

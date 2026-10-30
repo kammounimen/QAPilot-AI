@@ -1,0 +1,6 @@
+[submodule "restful-booker-platform"]
+	path = restful-booker-platform
+	url = https://github.com/mwinteringham/restful-booker-platform.git
+[submodule "app/restful-booker-platform"]
+	path = app/restful-booker-platform
+	url = https://github.com/mwinteringham/restful-booker-platform.git
