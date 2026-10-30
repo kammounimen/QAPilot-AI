@@ -1,0 +1,7 @@
+.venv
+**/.git
+.env
+reports
+**/node_modules
+**/target
+app/restful-booker-platform/assets

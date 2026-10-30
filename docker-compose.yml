@@ -1,0 +1,56 @@
+x-java-service: &java-service
+  restart: on-failure
+
+services:
+  rbp-auth:
+    <<: *java-service
+    build:
+      context: .
+      dockerfile: docker/java-service.Dockerfile
+      args: { MODULE: auth }
+    ports: ["3004:3004"]
+
+  rbp-booking:
+    <<: *java-service
+    build:
+      context: .
+      dockerfile: docker/java-service.Dockerfile
+      args: { MODULE: booking }
+    ports: ["3000:3000"]
+
+  rbp-room:
+    <<: *java-service
+    build:
+      context: .
+      dockerfile: docker/java-service.Dockerfile
+      args: { MODULE: room }
+    ports: ["3001:3001"]
+
+  rbp-branding:
+    <<: *java-service
+    build:
+      context: .
+      dockerfile: docker/java-service.Dockerfile
+      args: { MODULE: branding }
+    ports: ["3002:3002"]
+
+  rbp-report:
+    <<: *java-service
+    build:
+      context: .
+      dockerfile: docker/java-service.Dockerfile
+      args: { MODULE: report }
+    ports: ["3005:3005"]
+
+  rbp-message:
+    <<: *java-service
+    build:
+      context: .
+      dockerfile: docker/java-service.Dockerfile
+      args: { MODULE: message }
+    ports: ["3006:3006"]
+
+  rbp-assets:
+    build: ./app/restful-booker-platform/assets
+    restart: on-failure
+    ports: ["8080:80"]
