@@ -1,0 +1,72 @@
+{
+  "cases": [
+    {
+      "id": "TC-006-01",
+      "requirement_id": "REQ-006",
+      "title": "Réservation réussie avec données valides",
+      "type": "nominal",
+      "layer": "UI",
+      "priority": "Haute",
+      "preconditions": [
+        "L'utilisateur est sur la page de réservation",
+        "L'administrateur est authentifié via l'API"
+      ],
+      "steps": [
+        {
+          "action": "POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
+          "expected": "Réponse 200 et cookie token présent"
+        },
+        {
+          "action": "Ouvrir la page de réservation du site",
+          "expected": "Le formulaire de réservation est affiché"
+        },
+        {
+          "action": "Saisir le prénom \"Jean\", le nom \"Dupont\", l'email \"jean.dupont@example.com\", le téléphone \"0123456789\", la date d'arrivée \"2024-12-01\" et la date de départ \"2024-12-05\"",
+          "expected": "Les champs sont remplis correctement"
+        },
+        {
+          "action": "Cliquer sur le bouton \"Réserver\"",
+          "expected": "Message de confirmation \"Réservation confirmée\" affiché"
+        },
+        {
+          "action": "Accéder au calendrier admin (UI)",
+          "expected": "La réservation apparaît dans le calendrier aux dates du 01/12/2024 au 05/12/2024"
+        }
+      ]
+    },
+    {
+      "id": "TC-006-02",
+      "requirement_id": "REQ-006",
+      "title": "Réservation refusée lorsque la date de départ est antérieure à la date d'arrivée",
+      "type": "negative",
+      "layer": "UI",
+      "priority": "Haute",
+      "preconditions": [
+        "L'utilisateur est sur la page de réservation",
+        "L'administrateur est authentifié via l'API"
+      ],
+      "steps": [
+        {
+          "action": "POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
+          "expected": "Réponse 200 et cookie token présent"
+        },
+        {
+          "action": "Ouvrir la page de réservation du site",
+          "expected": "Le formulaire de réservation est affiché"
+        },
+        {
+          "action": "Saisir le prénom \"Marie\", le nom \"Leroy\", l'email \"marie.leroy@example.com\", le téléphone \"0987654321\", la date d'arrivée \"2024-12-10\" et la date de départ \"2024-12-08\"",
+          "expected": "Les champs sont remplis, mais la date de départ est antérieure à la date d'arrivée"
+        },
+        {
+          "action": "Cliquer sur le bouton \"Réserver\"",
+          "expected": "Message d'erreur \"La date de départ doit être postérieure à la date d'arrivée\" affiché et aucune réservation n'est créée"
+        },
+        {
+          "action": "Vérifier le calendrier admin (UI)",
+          "expected": "Aucune nouvelle entrée n'apparaît aux dates du 08/12/2024 au 10/12/2024"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "id": "TC-012-01",
+      "requirement_id": "REQ-012",
+      "title": "Connexion réussie avec des identifiants valides",
+      "type": "nominal",
+      "layer": "API",
+      "priority": "Haute",
+      "preconditions": [],
+      "steps": [
+        {
+          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
+          "expected": "Réponse 200 et le cookie 'token' présent"
+        }
+      ]
+    },
+    {
+      "id": "TC-012-02",
+      "requirement_id": "REQ-012",
+      "title": "Échec de connexion sans mot de passe",
+      "type": "negative",
+      "layer": "API",
+      "priority": "Haute",
+      "preconditions": [],
+      "steps": [
+        {
+          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\"} (mot de passe manquant)",
+          "expected": "Réponse 401 Unauthorized"
+        }
+      ]
+    },
+    {
+      "id": "TC-012-03",
+      "requirement_id": "REQ-012",
+      "title": "Échec de connexion avec mot de passe incorrect",
+      "type": "negative",
+      "layer": "API",
+      "priority": "Haute",
+      "preconditions": [],
+      "steps": [
+        {
+          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"wrong\"}",
+          "expected": "Réponse 401 Unauthorized"
+        }
+      ]
+    }
+  ]
+}

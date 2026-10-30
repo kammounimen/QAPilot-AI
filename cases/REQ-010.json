@@ -1,0 +1,77 @@
+{
+  "cases": [
+    {
+      "id": "TC-010-01",
+      "requirement_id": "REQ-010",
+      "title": "Consultation d'un message existant",
+      "type": "nominal",
+      "layer": "UI",
+      "priority": "Moyenne",
+      "preconditions": [
+        "Un message de contact a été envoyé par un visiteur et est présent dans la boîte de réception admin"
+      ],
+      "steps": [
+        {
+          "action": "Se rendre sur la page de connexion et saisir les identifiants admin (username: admin, password: password)",
+          "expected": "Le serveur répond 200 et renvoie le cookie `token`; l'utilisateur est authentifié"
+        },
+        {
+          "action": "Cliquer sur le menu \"Messages\" dans l'interface admin",
+          "expected": "La liste des messages s'affiche et le message précédemment envoyé apparaît"
+        },
+        {
+          "action": "Sélectionner le message dans la liste et cliquer sur \"Ouvrir\"",
+          "expected": "Le contenu complet du message s'affiche"
+        },
+        {
+          "action": "Cliquer sur le bouton \"Marquer comme lu\"",
+          "expected": "Le statut du message passe à \"lu\" et l'icône correspondante change"
+        }
+      ]
+    },
+    {
+      "id": "TC-010-02",
+      "requirement_id": "REQ-010",
+      "title": "Suppression d'un message",
+      "type": "nominal",
+      "layer": "UI",
+      "priority": "Moyenne",
+      "preconditions": [
+        "Un message non lu est présent dans la boîte de réception admin"
+      ],
+      "steps": [
+        {
+          "action": "Se connecter avec les identifiants admin (login via UI)",
+          "expected": "Authentification réussie, cookie `token` reçu"
+        },
+        {
+          "action": "Accéder à la section \"Messages\"",
+          "expected": "La liste des messages s'affiche"
+        },
+        {
+          "action": "Sélectionner le message cible et cliquer sur \"Supprimer\"",
+          "expected": "Une boîte de confirmation apparaît"
+        },
+        {
+          "action": "Confirmer la suppression",
+          "expected": "Le message disparaît de la liste et un message de succès \"Message supprimé\" s'affiche"
+        }
+      ]
+    },
+    {
+      "id": "TC-010-03",
+      "requirement_id": "REQ-010",
+      "title": "Échec de connexion avec des identifiants invalides",
+      "type": "negative",
+      "layer": "API",
+      "priority": "Moyenne",
+      "preconditions": [],
+      "steps": [
+        {
+          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"wrong\"}",
+          "expected": "Le serveur répond 401 Unauthorized, aucun cookie `token` n'est retourné"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "cases": [
+    {
+      "id": "TC-009-01",
+      "requirement_id": "REQ-009",
+      "title": "Envoi du formulaire de contact avec données valides",
+      "type": "nominal",
+      "layer": "UI",
+      "priority": "Moyenne",
+      "preconditions": [
+        "L'utilisateur est authentifié via POST /api/auth/login avec {\"username\":\"admin\",\"password\":\"password\"} et possède le cookie token"
+      ],
+      "steps": [
+        {
+          "action": "Accéder à la page de contact",
+          "expected": "Le formulaire de contact s'affiche"
+        },
+        {
+          "action": "Saisir un nom valide, un email valide (ex: user@example.com), un sujet de 20 caractères et un message de 100 caractères",
+          "expected": "Les champs sont remplis correctement"
+        },
+        {
+          "action": "Cliquer sur le bouton \"Envoyer\"",
+          "expected": "Un message de confirmation \"Message envoyé\" apparaît"
+        }
+      ]
+    },
+    {
+      "id": "TC-009-02",
+      "requirement_id": "REQ-009",
+      "title": "Envoi du formulaire avec tous les champs vides",
+      "type": "negative",
+      "layer": "UI",
+      "priority": "Moyenne",
+      "preconditions": [
+        "L'utilisateur est authentifié via POST /api/auth/login avec {\"username\":\"admin\",\"password\":\"password\"} et possède le cookie token"
+      ],
+      "steps": [
+        {
+          "action": "Accéder à la page de contact",
+          "expected": "Le formulaire de contact s'affiche"
+        },
+        {
+          "action": "Laisser tous les champs vides et cliquer sur \"Envoyer\"",
+          "expected": "Des messages d'erreur s'affichent pour chaque champ obligatoire (Nom, Email, Sujet, Message)"
+        }
+      ]
+    },
+    {
+      "id": "TC-009-03",
+      "requirement_id": "REQ-009",
+      "title": "Envoi du formulaire avec email invalide",
+      "type": "negative",
+      "layer": "UI",
+      "priority": "Moyenne",
+      "preconditions": [
+        "L'utilisateur est authentifié via POST /api/auth/login avec {\"username\":\"admin\",\"password\":\"password\"} et possède le cookie token"
+      ],
+      "steps": [
+        {
+          "action": "Accéder à la page de contact",
+          "expected": "Le formulaire de contact s'affiche"
+        },
+        {
+          "action": "Saisir un nom valide, un email \"invalid-email\", un sujet valide et un message valide puis cliquer sur \"Envoyer\"",
+          "expected": "Un message d'erreur \"Email invalide\" s'affiche sous le champ Email"
+        }
+      ]
+    },
+    {
+      "id": "TC-009-04",
+      "requirement_id": "REQ-009",
+      "title": "Envoi du formulaire avec sujet trop court",
+      "type": "negative",
+      "layer": "UI",
+      "priority": "Moyenne",
+      "preconditions": [
+        "L'utilisateur est authentifié via POST /api/auth/login avec {\"username\":\"admin\",\"password\":\"password\"} et possède le cookie token"
+      ],
+      "steps": [
+        {
+          "action": "Accéder à la page de contact",
+          "expected": "Le formulaire de contact s'affiche"
+        },
+        {
+          "action": "Saisir un nom valide, un email valide, un sujet de 2 caractères et un message valide puis cliquer sur \"Envoyer\"",
+          "expected": "Un message d'erreur \"Sujet trop court\" s'affiche sous le champ Sujet"
+        }
+      ]
+    }
+  ]
+}

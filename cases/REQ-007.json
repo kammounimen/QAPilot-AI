@@ -1,0 +1,34 @@
+{
+  "cases": [
+    {
+      "id": "TC-007-01",
+      "requirement_id": "REQ-007",
+      "title": "Authentification réussie avec des identifiants valides",
+      "type": "nominal",
+      "layer": "API",
+      "priority": "Haute",
+      "preconditions": [],
+      "steps": [
+        {
+          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
+          "expected": "Réponse 200 et le cookie `token` présent"
+        }
+      ]
+    },
+    {
+      "id": "TC-007-02",
+      "requirement_id": "REQ-007",
+      "title": "Authentification refusée avec champs obligatoires vides",
+      "type": "negative",
+      "layer": "API",
+      "priority": "Haute",
+      "preconditions": [],
+      "steps": [
+        {
+          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"\",\"password\":\"\"}",
+          "expected": "Réponse 401 Unauthorized"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "cases": [
+    {
+      "id": "TC-001-01",
+      "requirement_id": "REQ-001",
+      "title": "Connexion administrateur avec identifiants valides",
+      "type": "nominal",
+      "layer": "API",
+      "priority": "Haute",
+      "preconditions": [
+        "Le serveur API est disponible",
+        "Un compte administrateur existe avec username \"admin\" et password \"password\""
+      ],
+      "steps": [
+        {
+          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
+          "expected": "Réponse HTTP 200 et cookie \"token\" présent"
+        }
+      ]
+    },
+    {
+      "id": "TC-001-02",
+      "requirement_id": "REQ-001",
+      "title": "Connexion administrateur avec mot de passe incorrect",
+      "type": "negative",
+      "layer": "API",
+      "priority": "Haute",
+      "preconditions": [
+        "Le serveur API est disponible",
+        "Un compte administrateur existe avec username \"admin\" et password \"password\""
+      ],
+      "steps": [
+        {
+          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"wrongpass\"}",
+          "expected": "Réponse HTTP 401 et message d'erreur d'authentification"
+        }
+      ]
+    },
+    {
+      "id": "TC-001-03",
+      "requirement_id": "REQ-001",
+      "title": "Connexion administrateur avec champs vides",
+      "type": "negative",
+      "layer": "API",
+      "priority": "Haute",
+      "preconditions": [
+        "Le serveur API est disponible"
+      ],
+      "steps": [
+        {
+          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"\",\"password\":\"\"}",
+          "expected": "Réponse HTTP 401 et message d'erreur indiquant que les champs sont requis"
+        }
+      ]
+    }
+  ]
+}

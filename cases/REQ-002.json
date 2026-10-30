@@ -1,0 +1,70 @@
+{
+  "cases": [
+    {
+      "id": "TC-002-01",
+      "requirement_id": "REQ-002",
+      "title": "Authentification réussie via API",
+      "type": "nominal",
+      "layer": "API",
+      "priority": "Haute",
+      "preconditions": [],
+      "steps": [
+        {
+          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
+          "expected": "Réponse 200 et cookie `token` présent"
+        }
+      ]
+    },
+    {
+      "id": "TC-002-02",
+      "requirement_id": "REQ-002",
+      "title": "Échec d'authentification avec identifiants invalides",
+      "type": "negative",
+      "layer": "API",
+      "priority": "Haute",
+      "preconditions": [],
+      "steps": [
+        {
+          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"wrong\"}",
+          "expected": "Réponse 401 Unauthorized, aucun cookie `token`"
+        }
+      ]
+    },
+    {
+      "id": "TC-002-03",
+      "requirement_id": "REQ-002",
+      "title": "Affichage de la liste des chambres après connexion",
+      "type": "nominal",
+      "layer": "UI",
+      "priority": "Haute",
+      "preconditions": [
+        "Authentification réussie (voir TC-001)"
+      ],
+      "steps": [
+        {
+          "action": "Naviguer vers la page d'accueil après réception du cookie `token`",
+          "expected": "La page affiche une liste de chambres où chaque élément montre le type de la chambre et le prix"
+        },
+        {
+          "action": "Vérifier la présence d'un bouton 'Réserver' pour chaque chambre",
+          "expected": "Chaque chambre possède un bouton de réservation cliquable"
+        }
+      ]
+    },
+    {
+      "id": "TC-002-04",
+      "requirement_id": "REQ-002",
+      "title": "Accès à la page d'accueil sans authentification",
+      "type": "negative",
+      "layer": "UI",
+      "priority": "Haute",
+      "preconditions": [],
+      "steps": [
+        {
+          "action": "Ouvrir la page d'accueil sans fournir le cookie `token`",
+          "expected": "Redirection vers la page de connexion ou affichage d'un message d'erreur, aucune liste de chambres n'est visible"
+        }
+      ]
+    }
+  ]
+}

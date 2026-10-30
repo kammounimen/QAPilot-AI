@@ -1,0 +1,58 @@
+{
+  "cases": [
+    {
+      "id": "TC-005-01",
+      "requirement_id": "REQ-005",
+      "title": "Suppression d'une chambre existante (cas nominal)",
+      "type": "nominal",
+      "layer": "UI",
+      "priority": "Moyenne",
+      "preconditions": [
+        "L'administrateur est connecté à l'application."
+      ],
+      "steps": [
+        {
+          "action": "Se rendre sur la page d'administration des chambres.",
+          "expected": "La liste des chambres s'affiche."
+        },
+        {
+          "action": "Cliquer sur le bouton \"Supprimer\" de la chambre avec l'ID 123.",
+          "expected": "Une boîte de confirmation apparaît."
+        },
+        {
+          "action": "Confirmer la suppression.",
+          "expected": "Le serveur répond avec un statut 200 et la chambre disparaît de la liste."
+        },
+        {
+          "action": "Actualiser la page d'accueil.",
+          "expected": "La chambre supprimée n'est plus visible sur la page d'accueil."
+        }
+      ]
+    },
+    {
+      "id": "TC-005-02",
+      "requirement_id": "REQ-005",
+      "title": "Tentative de suppression d'une chambre inexistante (cas négatif)",
+      "type": "negative",
+      "layer": "UI",
+      "priority": "Moyenne",
+      "preconditions": [
+        "L'administrateur est connecté à l'application."
+      ],
+      "steps": [
+        {
+          "action": "Se rendre sur la page d'administration des chambres.",
+          "expected": "La liste des chambres s'affiche."
+        },
+        {
+          "action": "Tenter de supprimer la chambre avec l'ID 9999 (inexistant) via l'URL ou le bouton.",
+          "expected": "Le serveur répond avec un statut 404 ou 400, aucune erreur 500 n'est renvoyée."
+        },
+        {
+          "action": "Vérifier que la liste des chambres reste inchangée.",
+          "expected": "Aucune modification de la liste, aucune erreur serveur affichée."
+        }
+      ]
+    }
+  ]
+}
