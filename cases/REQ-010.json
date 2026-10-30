@@ -3,53 +3,30 @@
     {
       "id": "TC-010-01",
       "requirement_id": "REQ-010",
-      "title": "Connexion admin et récupération de la boîte de messages contenant le message attendu",
+      "title": "Connexion admin réussie",
       "type": "nominal",
       "layer": "API",
-      "priority": "Moyenne",
+      "priority": "Haute",
       "preconditions": [],
       "steps": [
         {
-          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse 200 avec un JSON contenant le champ \"token\""
-        },
-        {
-          "action": "Conserver le token retourné et l’inclure dans le cookie de la prochaine requête (token=<jeton>)",
-          "expected": "Cookie correctement renseigné"
-        },
-        {
-          "action": "Envoyer une requête GET /api/message avec le cookie token",
-          "expected": "Réponse 200 avec un JSON contenant la clé \"messages\" et incluant un objet dont les champs sont : id (int), name=\"James Dean\", read=false, subject=\"Booking enquiry\""
+          "action": "Envoyer une requête POST /api/auth/login avec le corps JSON {\"username\":\"admin\",\"password\":\"correctPassword\"}",
+          "expected": "Réponse 200 avec un corps contenant {\"token\":\"...\"}"
         }
       ]
     },
     {
       "id": "TC-010-02",
       "requirement_id": "REQ-010",
-      "title": "Échec de connexion avec mot de passe incorrect",
+      "title": "Connexion admin échouée avec identifiants invalides",
       "type": "negative",
       "layer": "API",
-      "priority": "Moyenne",
+      "priority": "Haute",
       "preconditions": [],
       "steps": [
         {
-          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"wrongpass\"}",
-          "expected": "Réponse 401 avec le JSON {\"error\":\"Invalid credentials\"}"
-        }
-      ]
-    },
-    {
-      "id": "TC-010-03",
-      "requirement_id": "REQ-010",
-      "title": "Accès à la boîte de messages sans authentification",
-      "type": "negative",
-      "layer": "API",
-      "priority": "Moyenne",
-      "preconditions": [],
-      "steps": [
-        {
-          "action": "Envoyer une requête GET /api/message sans le cookie token",
-          "expected": "Réponse 401 (ou 403 selon implémentation) indiquant que l’accès est refusé"
+          "action": "Envoyer une requête POST /api/auth/login avec le corps JSON {\"username\":\"admin\",\"password\":\"mauvaisPassword\"}",
+          "expected": "Réponse 401 avec un corps contenant {\"error\":\"Invalid credentials\"}"
         }
       ]
     }

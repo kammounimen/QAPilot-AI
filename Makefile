@@ -38,3 +38,9 @@ report:
 
 all: up cases sync tests run push report
 
+gen-tests:
+	uv run python -m pipeline.gen_tests
+	uv run python -m pipeline.check_tests
+
+run:
+	uv run pytest tests/api tests/gold

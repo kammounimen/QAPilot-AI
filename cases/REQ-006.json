@@ -3,80 +3,34 @@
     {
       "id": "TC-006-01",
       "requirement_id": "REQ-006",
-      "title": "Réservation valide avec toutes les informations correctes",
+      "title": "Connexion valide et récupération des chambres",
       "type": "nominal",
-      "layer": "UI",
+      "layer": "API",
       "priority": "Haute",
-      "preconditions": [
-        "L'utilisateur accède à la page de réservation",
-        "Le formulaire de réservation est affiché"
-      ],
+      "preconditions": [],
       "steps": [
         {
-          "action": "Saisir le prénom \"Jean\" dans le champ Prénom",
-          "expected": "Le champ Prénom contient \"Jean\""
+          "action": "POST /api/auth/login avec corps {\"email\":\"user@example.com\",\"password\":\"CorrectPwd\"}",
+          "expected": "Réponse 200 avec JSON contenant le champ \"token\""
         },
         {
-          "action": "Saisir le nom \"Dupont\" dans le champ Nom",
-          "expected": "Le champ Nom contient \"Dupont\""
-        },
-        {
-          "action": "Saisir l'email \"jean.dupont@example.com\" dans le champ Email",
-          "expected": "Le champ Email contient \"jean.dupont@example.com\""
-        },
-        {
-          "action": "Saisir le téléphone \"0601020304\" dans le champ Téléphone",
-          "expected": "Le champ Téléphone contient \"0601020304\""
-        },
-        {
-          "action": "Sélectionner la date d'arrivée \"2024-12-01\" et la date de départ \"2024-12-05\"",
-          "expected": "Les dates sont affichées correctement et la date de départ est postérieure à la date d'arrivée"
-        },
-        {
-          "action": "Cliquer sur le bouton \"Réserver\"",
-          "expected": "Un message de confirmation s'affiche \"Réservation confirmée\""
-        },
-        {
-          "action": "Accéder à l'interface admin et ouvrir le calendrier",
-          "expected": "La réservation apparaît dans le calendrier aux dates 01/12/2024 - 05/12/2024"
+          "action": "GET /api/room avec l'en-tête Authorization: Bearer <token>",
+          "expected": "Réponse 200 avec un tableau contenant les trois chambres : {\"roomid\":1,\"roomName\":\"101\"...}, {\"roomid\":2,\"roomName\":\"102\"...}, {\"roomid\":3,\"roomName\":\"103\"...}"
         }
       ]
     },
     {
       "id": "TC-006-02",
       "requirement_id": "REQ-006",
-      "title": "Réservation refusée lorsque la date de départ est antérieure à la date d'arrivée",
+      "title": "Échec de connexion avec identifiants invalides",
       "type": "negative",
-      "layer": "UI",
+      "layer": "API",
       "priority": "Haute",
-      "preconditions": [
-        "L'utilisateur accède à la page de réservation",
-        "Le formulaire de réservation est affiché"
-      ],
+      "preconditions": [],
       "steps": [
         {
-          "action": "Saisir le prénom \"Marie\" dans le champ Prénom",
-          "expected": "Le champ Prénom contient \"Marie\""
-        },
-        {
-          "action": "Saisir le nom \"Lefevre\" dans le champ Nom",
-          "expected": "Le champ Nom contient \"Lefevre\""
-        },
-        {
-          "action": "Saisir l'email \"marie.lefevre@example.com\" dans le champ Email",
-          "expected": "Le champ Email contient \"marie.lefevre@example.com\""
-        },
-        {
-          "action": "Saisir le téléphone \"0611223344\" dans le champ Téléphone",
-          "expected": "Le champ Téléphone contient \"0611223344\""
-        },
-        {
-          "action": "Sélectionner la date d'arrivée \"2024-12-10\" et la date de départ \"2024-12-08\"",
-          "expected": "Le champ date de départ indique une date antérieure à la date d'arrivée"
-        },
-        {
-          "action": "Cliquer sur le bouton \"Réserver\"",
-          "expected": "Un message d'erreur s'affiche \"La date de départ doit être postérieure à la date d'arrivée\" et la réservation n'est pas créée"
+          "action": "POST /api/auth/login avec corps {\"email\":\"user@example.com\",\"password\":\"WrongPwd\"}",
+          "expected": "Réponse 401 avec JSON {\"error\":\"Invalid credentials\"}"
         }
       ]
     }

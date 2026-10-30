@@ -3,30 +3,78 @@
     {
       "id": "TC-004-01",
       "requirement_id": "REQ-004",
-      "title": "Connexion administrateur avec identifiants valides",
+      "title": "Connexion administrateur - succès",
       "type": "nominal",
       "layer": "API",
       "priority": "Moyenne",
       "preconditions": [],
       "steps": [
         {
-          "action": "POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse 200 et JSON contenant le champ \"token\" avec une chaîne non vide"
+          "action": "POST /api/auth/login avec le corps JSON {\"username\":\"admin\",\"password\":\"correctPassword\"}",
+          "expected": "Réponse 200 avec un corps contenant {\"token\":\"...\"}"
         }
       ]
     },
     {
       "id": "TC-004-02",
       "requirement_id": "REQ-004",
-      "title": "Connexion administrateur avec mot de passe invalide",
+      "title": "Modification du prix d'une chambre - succès (UI)",
+      "type": "nominal",
+      "layer": "UI",
+      "priority": "Moyenne",
+      "preconditions": [
+        "L'administrateur est connecté à l'interface UI (token obtenu via login)",
+        "La chambre 101 existe avec le prix actuel 100"
+      ],
+      "steps": [
+        {
+          "action": "Depuis la page d'accueil, cliquer sur la chambre 101 puis sur le bouton \"Modifier\"",
+          "expected": "Affichage du formulaire d'édition de la chambre 101"
+        },
+        {
+          "action": "Modifier le champ \"Prix\" à 120 et cliquer sur \"Enregistrer\"",
+          "expected": "Message de confirmation de succès affiché"
+        },
+        {
+          "action": "Retourner à la page d'accueil et vérifier le prix affiché pour la chambre 101",
+          "expected": "Le prix affiché est 120"
+        }
+      ]
+    },
+    {
+      "id": "TC-004-03",
+      "requirement_id": "REQ-004",
+      "title": "Connexion administrateur - échec avec identifiants invalides",
       "type": "negative",
       "layer": "API",
       "priority": "Moyenne",
       "preconditions": [],
       "steps": [
         {
-          "action": "POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"wrong\"}",
-          "expected": "Réponse 401 et JSON {\"error\":\"Invalid credentials\"}"
+          "action": "POST /api/auth/login avec le corps JSON {\"username\":\"admin\",\"password\":\"mauvaisPassword\"}",
+          "expected": "Réponse 401 avec le corps {\"error\":\"Invalid credentials\"}"
+        }
+      ]
+    },
+    {
+      "id": "TC-004-04",
+      "requirement_id": "REQ-004",
+      "title": "Modification d'une chambre avec données invalides (UI)",
+      "type": "negative",
+      "layer": "UI",
+      "priority": "Moyenne",
+      "preconditions": [
+        "L'administrateur est connecté à l'interface UI",
+        "La chambre 102 existe"
+      ],
+      "steps": [
+        {
+          "action": "Ouvrir le formulaire de modification de la chambre 102",
+          "expected": "Formulaire d'édition affiché"
+        },
+        {
+          "action": "Saisir un prix négatif (-10) et cliquer sur \"Enregistrer\"",
+          "expected": "Message d'erreur affiché indiquant que les données sont invalides et aucune modification n'est enregistrée"
         }
       ]
     }

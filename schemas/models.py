@@ -28,3 +28,5 @@ class TestCase(BaseModel):
 
 class CaseList(BaseModel):
     cases: list[TestCase] = Field(min_length=2)
+class GeneratedTest(BaseModel):
+    code: str = Field(min_length=20)

@@ -3,56 +3,34 @@
     {
       "id": "TC-012-01",
       "requirement_id": "REQ-012",
-      "title": "Lecture des messages avec authentification valide",
+      "title": "Accès à la liste des chambres sans jeton",
       "type": "nominal",
       "layer": "API",
       "priority": "Haute",
       "preconditions": [
-        "Le serveur est disponible",
-        "Aucun token valide présent"
+        "Aucun jeton d'authentification présent"
       ],
       "steps": [
         {
-          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse 200 contenant un champ \"token\""
-        },
-        {
-          "action": "Envoyer une requête GET /api/message avec le cookie token=<valeur du token reçu>",
-          "expected": "Réponse 200 avec un tableau \"messages\" contenant au moins le message initial"
+          "action": "Envoyer une requête GET sur /api/room sans l'en-tête Authorization",
+          "expected": "Réponse HTTP 401 (ou 403) avec un corps JSON contenant une indication d'erreur d'authentification"
         }
       ]
     },
     {
       "id": "TC-012-02",
       "requirement_id": "REQ-012",
-      "title": "Lecture des messages sans token",
+      "title": "Accès à la liste des chambres avec jeton invalide",
       "type": "negative",
       "layer": "API",
       "priority": "Haute",
       "preconditions": [
-        "Le serveur est disponible"
+        "Un jeton invalide ou expiré est disponible (ex: \"invalidtoken\")"
       ],
       "steps": [
         {
-          "action": "Envoyer une requête GET /api/message sans inclure le cookie token",
-          "expected": "Réponse 401 ou 403 indiquant l'absence d'authentification"
-        }
-      ]
-    },
-    {
-      "id": "TC-012-03",
-      "requirement_id": "REQ-012",
-      "title": "Lecture des messages avec token invalide",
-      "type": "negative",
-      "layer": "API",
-      "priority": "Haute",
-      "preconditions": [
-        "Le serveur est disponible"
-      ],
-      "steps": [
-        {
-          "action": "Envoyer une requête GET /api/message avec le cookie token=invalid_or_expired_token",
-          "expected": "Réponse 401 ou 403 indiquant que le token est invalide ou expiré"
+          "action": "Envoyer une requête GET sur /api/room avec l'en-tête Authorization: Bearer invalidtoken",
+          "expected": "Réponse HTTP 401 (ou 403) indiquant que le jeton est invalide ou expiré"
         }
       ]
     }

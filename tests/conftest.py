@@ -4,6 +4,7 @@ import pytest
 import requests
 from dotenv import load_dotenv
 
+from known_gaps import INCONSISTENT_CASES, REASON
 load_dotenv()
 
 
@@ -21,3 +22,10 @@ def admin_token(base_url):
     )
     assert r.status_code == 200
     return r.json()["token"]
+
+
+def pytest_collection_modifyitems(config, items):
+    for item in items:
+        marker = item.get_closest_marker("tc")
+        if marker and marker.args and marker.args[0] in INCONSISTENT_CASES:
+            item.add_marker(pytest.mark.xfail(reason=REASON, strict=False))

@@ -8,37 +8,29 @@
       "layer": "UI",
       "priority": "Haute",
       "preconditions": [
-        "L'administrateur possède un compte valide (username: admin, password: password)",
-        "Le token d'authentification a été obtenu via POST /api/auth/login et stocké dans le cookie `token`"
+        "L'administrateur possède un compte valide et est connecté",
+        "Aucune chambre avec le numéro \"104\" n'existe dans le système"
       ],
       "steps": [
         {
-          "action": "Ouvrir la page d'accueil du site en tant qu'administrateur authentifié",
-          "expected": "La page d'accueil s'affiche avec le menu d'administration visible"
+          "action": "Accéder à la page d'administration des chambres",
+          "expected": "Le formulaire de création de chambre est affiché"
         },
         {
-          "action": "Cliquer sur le lien \"Gestion des chambres\" dans le menu admin",
-          "expected": "La liste des chambres existantes s'affiche"
-        },
-        {
-          "action": "Cliquer sur le bouton \"Créer une chambre\"",
-          "expected": "Le formulaire de création de chambre apparaît"
-        },
-        {
-          "action": "Saisir le numéro \"101\", le type \"Double\", le prix \"120.00\" et cocher l'option \"Accessible aux personnes à mobilité réduite\"",
+          "action": "Saisir le numéro \"104\", le type \"Deluxe\", le prix \"200\" et l'accessibilité \"Oui\"",
           "expected": "Les champs du formulaire contiennent les valeurs saisies"
         },
         {
-          "action": "Valider le formulaire en cliquant sur \"Enregistrer\"",
-          "expected": "Un appel serveur réussit et la réponse indique la création (status 201 ou équivalent) ; un message de confirmation s'affiche"
+          "action": "Cliquer sur le bouton \"Créer la chambre\"",
+          "expected": "Un message de succès s'affiche et la chambre est enregistrée"
         },
         {
-          "action": "Vérifier que la nouvelle chambre \"101\" apparaît dans la liste admin",
-          "expected": "La ligne correspondant à la chambre 101 est visible dans le tableau des chambres"
+          "action": "Naviguer vers la liste des chambres administrateur",
+          "expected": "La chambre \"104\" apparaît dans la liste avec les bonnes informations"
         },
         {
-          "action": "Naviguer vers la page d'accueil publique",
-          "expected": "La chambre 101 est visible dans la liste des chambres proposées aux clients"
+          "action": "Aller sur la page d'accueil du site",
+          "expected": "La chambre \"104\" est visible parmi les chambres disponibles"
         }
       ]
     },
@@ -50,29 +42,24 @@
       "layer": "UI",
       "priority": "Haute",
       "preconditions": [
-        "L'administrateur possède un compte valide (username: admin, password: password)",
-        "Le token d'authentification a été obtenu via POST /api/auth/login et stocké dans le cookie `token`"
+        "L'administrateur possède un compte valide et est connecté"
       ],
       "steps": [
         {
-          "action": "Ouvrir la page d'accueil du site en tant qu'administrateur authentifié",
-          "expected": "La page d'accueil s'affiche avec le menu d'administration visible"
+          "action": "Accéder à la page d'administration des chambres",
+          "expected": "Le formulaire de création de chambre est affiché"
         },
         {
-          "action": "Accéder au formulaire de création de chambre via le menu admin",
-          "expected": "Le formulaire de création de chambre apparaît"
+          "action": "Laisser le champ numéro vide et saisir un prix \"-50\" (valeur invalide)",
+          "expected": "Les champs du formulaire contiennent les valeurs saisies (numéro vide, prix négatif)"
         },
         {
-          "action": "Laisser le champ numéro vide, saisir le type \"Simple\", le prix \"-50\" et ne pas cocher l'accessibilité",
-          "expected": "Les champs contiennent les valeurs saisies (numéro vide, prix négatif)"
+          "action": "Cliquer sur le bouton \"Créer la chambre\"",
+          "expected": "Un message d'erreur s'affiche indiquant \"Numéro requis\" ou \"Prix invalide\" et la chambre n'est pas créée"
         },
         {
-          "action": "Cliquer sur \"Enregistrer\"",
-          "expected": "Le serveur renvoie une erreur de validation (status 400) ; un message d'erreur s'affiche, par exemple \"Le numéro de chambre est requis\" ou \"Le prix doit être positif\""
-        },
-        {
-          "action": "Vérifier que la chambre n'est pas ajoutée à la liste admin",
-          "expected": "La liste des chambres ne contient aucune nouvelle entrée"
+          "action": "Vérifier la liste des chambres administrateur",
+          "expected": "Aucune chambre avec un numéro vide ou un prix négatif n'apparaît dans la liste"
         }
       ]
     }

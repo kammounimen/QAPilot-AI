@@ -3,72 +3,70 @@
     {
       "id": "TC-001-01",
       "requirement_id": "REQ-001",
-      "title": "Connexion administrateur valide via API",
+      "title": "Connexion administrateur avec identifiants valides",
       "type": "nominal",
       "layer": "API",
       "priority": "Haute",
       "preconditions": [
-        "Aucun"
+        "Le serveur API est opérationnel",
+        "Le compte administrateur existe avec login 'admin' et mot de passe 'password'"
       ],
       "steps": [
         {
-          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"password\"}",
-          "expected": "Réponse 200 avec un JSON contenant la clé \"token\""
-        },
-        {
-          "action": "Envoyer une requête GET /api/message en incluant le cookie token=<valeur du token reçu>",
-          "expected": "Réponse 200 avec un tableau \"messages\" contenant le message initial"
+          "action": "Envoyer une requête POST /api/auth/login avec le corps JSON {\"username\":\"admin\",\"password\":\"password\"}",
+          "expected": "Réponse HTTP 200 et le corps contient {\"token\":\"...\"}"
         }
       ]
     },
     {
       "id": "TC-001-02",
       "requirement_id": "REQ-001",
-      "title": "Connexion administrateur avec mot de passe incorrect via API",
+      "title": "Connexion administrateur avec mot de passe incorrect",
       "type": "negative",
       "layer": "API",
       "priority": "Haute",
       "preconditions": [
-        "Aucun"
+        "Le serveur API est opérationnel"
       ],
       "steps": [
         {
-          "action": "Envoyer une requête POST /api/auth/login avec le corps {\"username\":\"admin\",\"password\":\"wrongpass\"}",
-          "expected": "Réponse 401 avec le JSON {\"error\":\"Invalid credentials\"}"
+          "action": "Envoyer une requête POST /api/auth/login avec le corps JSON {\"username\":\"admin\",\"password\":\"wrongpass\"}",
+          "expected": "Réponse HTTP 401 et le corps contient {\"error\":\"Invalid credentials\"}"
         }
       ]
     },
     {
       "id": "TC-001-03",
       "requirement_id": "REQ-001",
-      "title": "Connexion administrateur avec champs vides via UI",
+      "title": "Connexion administrateur avec champs vides via l'interface UI",
       "type": "negative",
       "layer": "UI",
       "priority": "Haute",
       "preconditions": [
-        "L'utilisateur est sur la page de connexion admin"
+        "L'application web est accessible",
+        "La page de connexion administrateur est affichée"
       ],
       "steps": [
         {
-          "action": "Laisser les champs \"Nom d'utilisateur\" et \"Mot de passe\" vides et cliquer sur le bouton \"Se connecter\"",
-          "expected": "Un message d'erreur s'affiche indiquant que les champs sont obligatoires"
+          "action": "Laisser les champs 'Identifiant' et 'Mot de passe' vides puis cliquer sur le bouton 'Se connecter'",
+          "expected": "Un message d'erreur s'affiche indiquant 'Invalid credentials' et l'accès à l'espace admin est refusé"
         }
       ]
     },
     {
       "id": "TC-001-04",
       "requirement_id": "REQ-001",
-      "title": "Connexion administrateur avec corps JSON invalide via API",
+      "title": "Connexion administrateur avec JSON malformé",
       "type": "negative",
       "layer": "API",
       "priority": "Haute",
       "preconditions": [
-        "Aucun"
+        "Le serveur API est opérationnel"
       ],
       "steps": [
         {
-          "action": "Envoyer une requête POST /api/auth/login avec un corps JSON mal formé (ex: \"{username:admin,password:password}\")",
-          "expected": "Réponse 500 indiquant une erreur serveur (voir DEF-001)"
+          "action": "Envoyer une requête POST /api/auth/login avec un corps non JSON (ex: \"username=admin&password=password\")",
+          "expected": "Réponse HTTP 500 conformément à la définition DEF-001"
         }
       ]
     }

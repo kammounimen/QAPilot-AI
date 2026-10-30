@@ -3,74 +3,148 @@
     {
       "id": "TC-008-01",
       "requirement_id": "REQ-008",
-      "title": "Envoi de message de contact avec toutes les données valides",
+      "title": "Envoi de message de contact avec toutes les informations valides",
       "type": "nominal",
       "layer": "UI",
       "priority": "Haute",
       "preconditions": [
-        "L'utilisateur accède à la page de formulaire de contact"
+        "Le visiteur est sur la page de formulaire de contact"
       ],
       "steps": [
         {
-          "action": "Saisir un nom valide dans le champ 'Nom'",
-          "expected": "Le champ accepte le texte saisi"
+          "action": "Saisir \"Jean Dupont\" dans le champ Nom",
+          "expected": "Le champ Nom accepte la saisie"
         },
         {
-          "action": "Saisir une adresse email valide dans le champ 'Email'",
-          "expected": "Le champ accepte le texte saisi"
+          "action": "Saisir \"jean.dupont@example.com\" dans le champ Email",
+          "expected": "Le champ Email accepte la saisie"
         },
         {
-          "action": "Saisir un numéro de téléphone valide dans le champ 'Téléphone'",
-          "expected": "Le champ accepte le texte saisi"
+          "action": "Saisir \"0601020304\" dans le champ Téléphone",
+          "expected": "Le champ Téléphone accepte la saisie"
         },
         {
-          "action": "Saisir un sujet valide dans le champ 'Sujet'",
-          "expected": "Le champ accepte le texte saisi"
+          "action": "Saisir \"Demande d'information\" dans le champ Sujet",
+          "expected": "Le champ Sujet accepte la saisie"
         },
         {
-          "action": "Saisir un message valide dans le champ 'Message'",
-          "expected": "Le champ accepte le texte saisi"
+          "action": "Saisir \"Bonjour, je souhaite obtenir plus de détails sur vos chambres.\" dans le champ Message",
+          "expected": "Le champ Message accepte la saisie"
         },
         {
-          "action": "Cliquer sur le bouton 'Envoyer'",
-          "expected": "Une confirmation s'affiche indiquant que le message a été envoyé avec succès"
+          "action": "Cliquer sur le bouton \"Envoyer\"",
+          "expected": "Une confirmation s'affiche : \"Votre message a été envoyé avec succès.\""
         }
       ]
     },
     {
       "id": "TC-008-02",
       "requirement_id": "REQ-008",
-      "title": "Tentative d'envoi de message avec email invalide",
+      "title": "Tentative d'envoi de message avec le champ Email vide",
       "type": "negative",
       "layer": "UI",
       "priority": "Haute",
       "preconditions": [
-        "L'utilisateur accède à la page de formulaire de contact"
+        "Le visiteur est sur la page de formulaire de contact"
       ],
       "steps": [
         {
-          "action": "Saisir un nom valide dans le champ 'Nom'",
-          "expected": "Le champ accepte le texte saisi"
+          "action": "Saisir \"Jean Dupont\" dans le champ Nom",
+          "expected": "Le champ Nom accepte la saisie"
         },
         {
-          "action": "Saisir une adresse email invalide (ex: 'user@@example') dans le champ 'Email'",
-          "expected": "Le champ signale une erreur de format d'email"
+          "action": "Laisser le champ Email vide",
+          "expected": "Le champ Email reste vide"
         },
         {
-          "action": "Saisir un numéro de téléphone valide dans le champ 'Téléphone'",
-          "expected": "Le champ accepte le texte saisi"
+          "action": "Saisir \"0601020304\" dans le champ Téléphone",
+          "expected": "Le champ Téléphone accepte la saisie"
         },
         {
-          "action": "Saisir un sujet valide dans le champ 'Sujet'",
-          "expected": "Le champ accepte le texte saisi"
+          "action": "Saisir \"Demande d'information\" dans le champ Sujet",
+          "expected": "Le champ Sujet accepte la saisie"
         },
         {
-          "action": "Saisir un message valide dans le champ 'Message'",
-          "expected": "Le champ accepte le texte saisé"
+          "action": "Saisir \"Bonjour\" dans le champ Message",
+          "expected": "Le champ Message accepte la saisie"
         },
         {
-          "action": "Cliquer sur le bouton 'Envoyer'",
-          "expected": "Aucun message de confirmation n'est affiché ; un message d'erreur indique que l'email est invalide"
+          "action": "Cliquer sur le bouton \"Envoyer\"",
+          "expected": "Un message d'erreur s'affiche : \"L'email est requis.\""
+        }
+      ]
+    },
+    {
+      "id": "TC-008-03",
+      "requirement_id": "REQ-008",
+      "title": "Envoi de message avec caractères spéciaux dans le sujet et le message",
+      "type": "nominal",
+      "layer": "UI",
+      "priority": "Haute",
+      "preconditions": [
+        "Le visiteur est sur la page de formulaire de contact"
+      ],
+      "steps": [
+        {
+          "action": "Saisir \"Élise Martin\" dans le champ Nom",
+          "expected": "Le champ Nom accepte la saisie"
+        },
+        {
+          "action": "Saisir \"elise.martin@example.fr\" dans le champ Email",
+          "expected": "Le champ Email accepte la saisie"
+        },
+        {
+          "action": "Saisir \"+33 6 12 34 56 78\" dans le champ Téléphone",
+          "expected": "Le champ Téléphone accepte la saisie"
+        },
+        {
+          "action": "Saisir \"Réservation: Chambre #101 – Offre spéciale!\" dans le champ Sujet",
+          "expected": "Le champ Sujet accepte la saisie"
+        },
+        {
+          "action": "Saisir \"Bonjour,\nJe suis intéressée par l'offre \"Suite + Petit-déjeuner\" pour le 15/12.\nMerci!\" dans le champ Message",
+          "expected": "Le champ Message accepte la saisie"
+        },
+        {
+          "action": "Cliquer sur le bouton \"Envoyer\"",
+          "expected": "Une confirmation s'affiche : \"Votre message a été envoyé avec succès.\""
+        }
+      ]
+    },
+    {
+      "id": "TC-008-04",
+      "requirement_id": "REQ-008",
+      "title": "Envoi de message avec email au format invalide",
+      "type": "negative",
+      "layer": "UI",
+      "priority": "Haute",
+      "preconditions": [
+        "Le visiteur est sur la page de formulaire de contact"
+      ],
+      "steps": [
+        {
+          "action": "Saisir \"Marc Leblanc\" dans le champ Nom",
+          "expected": "Le champ Nom accepte la saisie"
+        },
+        {
+          "action": "Saisir \"marc.leblanc[at]example.com\" dans le champ Email",
+          "expected": "Le champ Email accepte la saisie mais le format est invalide"
+        },
+        {
+          "action": "Saisir \"0601020305\" dans le champ Téléphone",
+          "expected": "Le champ Téléphone accepte la saisie"
+        },
+        {
+          "action": "Saisir \"Question tarifaire\" dans le champ Sujet",
+          "expected": "Le champ Sujet accepte la saisie"
+        },
+        {
+          "action": "Saisir \"Quel est le tarif pour deux personnes en double?\" dans le champ Message",
+          "expected": "Le champ Message accepte la saisie"
+        },
+        {
+          "action": "Cliquer sur le bouton \"Envoyer\"",
+          "expected": "Un message d'erreur s'affiche : \"Le format de l'email est invalide.\""
         }
       ]
     }

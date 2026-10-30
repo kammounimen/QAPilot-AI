@@ -3,128 +3,112 @@
     {
       "id": "TC-009-01",
       "requirement_id": "REQ-009",
-      "title": "Envoi du formulaire de contact avec des données valides",
+      "title": "Envoi valide du formulaire de contact",
       "type": "nominal",
       "layer": "UI",
       "priority": "Moyenne",
       "preconditions": [
-        "L'utilisateur est sur la page du formulaire de contact"
+        "L'utilisateur est authentifié et se trouve sur la page de contact"
       ],
       "steps": [
         {
-          "action": "Saisir \"Jean Dupont\" dans le champ Nom",
-          "expected": "Le champ Nom contient \"Jean Dupont\""
+          "action": "Saisir un prénom valide dans le champ 'Nom'",
+          "expected": "Le champ accepte la saisie"
         },
         {
-          "action": "Saisir \"jean.dupont@example.com\" dans le champ Email",
-          "expected": "Le champ Email contient \"jean.dupont@example.com\""
+          "action": "Saisir un nom de famille valide",
+          "expected": "Le champ accepte la saisie"
         },
         {
-          "action": "Saisir \"Demande d'information\" dans le champ Sujet",
-          "expected": "Le champ Sujet contient \"Demande d'information\""
+          "action": "Saisir une adresse email valide (ex: user@example.com)",
+          "expected": "Le champ accepte la saisie"
         },
         {
-          "action": "Saisir \"Bonjour, je souhaite obtenir plus de détails sur vos services.\" dans le champ Message",
-          "expected": "Le champ Message contient le texte saisi"
+          "action": "Saisir un sujet de longueur acceptable (ex: 20 caractères)",
+          "expected": "Le champ accepte la saisie"
         },
         {
-          "action": "Cliquer sur le bouton \"Envoyer\"",
-          "expected": "Un message de confirmation s'affiche : \"Votre message a été envoyé avec succès\" et aucun message d'erreur n'est visible"
+          "action": "Saisir un message de longueur acceptable (ex: 200 caractères)",
+          "expected": "Le champ accepte la saisie"
+        },
+        {
+          "action": "Cliquer sur le bouton 'Envoyer'",
+          "expected": "Le formulaire est soumis, le serveur répond 200 et un message de confirmation 'Message envoyé avec succès' s'affiche"
         }
       ]
     },
     {
       "id": "TC-009-02",
       "requirement_id": "REQ-009",
-      "title": "Refus de l'envoi avec tous les champs vides",
+      "title": "Rejet du formulaire avec tous les champs vides",
       "type": "negative",
       "layer": "UI",
       "priority": "Moyenne",
       "preconditions": [
-        "L'utilisateur est sur la page du formulaire de contact"
+        "L'utilisateur est sur la page de contact"
       ],
       "steps": [
         {
-          "action": "Laisser tous les champs (Nom, Email, Sujet, Message) vides",
-          "expected": "Tous les champs restent vides"
-        },
-        {
-          "action": "Cliquer sur le bouton \"Envoyer\"",
-          "expected": "Des messages d'erreur s'affichent sous chaque champ : \"Ce champ est obligatoire\""
+          "action": "Laisser tous les champs vides et cliquer sur 'Envoyer'",
+          "expected": "Le formulaire n'est pas soumis et des messages d'erreur 'Ce champ est obligatoire' apparaissent sous chaque champ"
         }
       ]
     },
     {
       "id": "TC-009-03",
       "requirement_id": "REQ-009",
-      "title": "Refus de l'envoi avec un email invalide",
+      "title": "Rejet du formulaire avec email invalide",
       "type": "negative",
       "layer": "UI",
       "priority": "Moyenne",
       "preconditions": [
-        "L'utilisateur est sur la page du formulaire de contact"
+        "L'utilisateur est sur la page de contact"
       ],
       "steps": [
         {
-          "action": "Saisir \"Marie Curie\" dans le champ Nom",
-          "expected": "Le champ Nom contient \"Marie Curie\""
+          "action": "Saisir un prénom et un nom valides",
+          "expected": "Les champs acceptent la saisie"
         },
         {
-          "action": "Saisir \"marie.curie@invalid\" dans le champ Email",
-          "expected": "Le champ Email contient \"marie.curie@invalid\""
+          "action": "Saisir 'email@invalid' dans le champ email",
+          "expected": "Le champ accepte la saisie"
         },
         {
-          "action": "Saisir \"Question\" dans le champ Sujet",
-          "expected": "Le champ Sujet contient \"Question\""
+          "action": "Saisir un sujet et un message valides",
+          "expected": "Les champs acceptent la saisie"
         },
         {
-          "action": "Saisir \"Pouvez-vous me préciser vos tarifs ?\" dans le champ Message",
-          "expected": "Le champ Message contient le texte saisi"
-        },
-        {
-          "action": "Cliquer sur le bouton \"Envoyer\"",
-          "expected": "Un message d'erreur s'affiche sous le champ Email : \"Adresse email invalide\" et le formulaire n'est pas soumis"
+          "action": "Cliquer sur 'Envoyer'",
+          "expected": "Le formulaire est rejeté et le message d'erreur 'Adresse email invalide' s'affiche sous le champ email"
         }
       ]
     },
     {
       "id": "TC-009-04",
       "requirement_id": "REQ-009",
-      "title": "Refus de l'envoi avec un sujet trop court ou trop long",
+      "title": "Rejet du formulaire avec sujet trop court et message trop long",
       "type": "negative",
       "layer": "UI",
       "priority": "Moyenne",
       "preconditions": [
-        "L'utilisateur est sur la page du formulaire de contact"
+        "L'utilisateur est sur la page de contact"
       ],
       "steps": [
         {
-          "action": "Saisir \"Paul Martin\" dans le champ Nom",
-          "expected": "Le champ Nom contient \"Paul Martin\""
+          "action": "Saisir un prénom, un nom et un email valides",
+          "expected": "Les champs acceptent la saisie"
         },
         {
-          "action": "Saisir \"paul.martin@example.com\" dans le champ Email",
-          "expected": "Le champ Email contient \"paul.martin@example.com\""
+          "action": "Saisir un sujet de 2 caractères",
+          "expected": "Le champ accepte la saisie"
         },
         {
-          "action": "Saisir \"Hi\" dans le champ Sujet (moins de 5 caractères)",
-          "expected": "Le champ Sujet contient \"Hi\""
+          "action": "Saisir un message de 5000 caractères (au‑delà de la limite)",
+          "expected": "Le champ accepte la saisie"
         },
         {
-          "action": "Saisir \"Message valide\" dans le champ Message",
-          "expected": "Le champ Message contient le texte saisi"
-        },
-        {
-          "action": "Cliquer sur le bouton \"Envoyer\"",
-          "expected": "Un message d'erreur s'affiche sous le champ Sujet : \"Le sujet doit contenir entre 5 et 100 caractères\""
-        },
-        {
-          "action": "Modifier le champ Sujet avec une chaîne de 101 caractères",
-          "expected": "Le champ Sujet contient la chaîne de 101 caractères"
-        },
-        {
-          "action": "Cliquer à nouveau sur le bouton \"Envoyer\"",
-          "expected": "Un message d'erreur s'affiche sous le champ Sujet : \"Le sujet doit contenir entre 5 et 100 caractères\""
+          "action": "Cliquer sur 'Envoyer'",
+          "expected": "Le formulaire est rejeté et les messages d'erreur 'Le sujet doit contenir entre 5 et 100 caractères' et 'Le message dépasse la longueur maximale autorisée' s'affichent"
         }
       ]
     }

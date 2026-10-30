@@ -3,54 +3,61 @@
     {
       "id": "TC-002-01",
       "requirement_id": "REQ-002",
-      "title": "Affichage nominal de la liste des chambres avec type, prix et bouton de réservation",
+      "title": "Récupération de la liste des chambres via l'API avec authentification valide",
       "type": "nominal",
-      "layer": "UI",
+      "layer": "API",
       "priority": "Haute",
       "preconditions": [
-        "L'utilisateur a ouvert le navigateur et a accédé à la page d'accueil du site."
+        "Un compte visiteur valide existe (ex: user@example.com / password)"
       ],
       "steps": [
         {
-          "action": "Charger la page d'accueil",
-          "expected": "La liste des chambres disponibles s'affiche."
+          "action": "Envoyer une requête POST /api/auth/login avec le corps JSON {\"email\":\"user@example.com\",\"password\":\"password\"}",
+          "expected": "Réponse 200 contenant un champ \"token\" non vide"
         },
         {
-          "action": "Pour chaque chambre affichée, vérifier la présence du champ \"type\"",
-          "expected": "Le type de la chambre est visible pour chaque entrée."
-        },
-        {
-          "action": "Pour chaque chambre affichée, vérifier la présence du champ \"prix\"",
-          "expected": "Le prix de la chambre est visible pour chaque entrée."
-        },
-        {
-          "action": "Pour chaque chambre affichée, vérifier la présence d'un bouton \"Réserver\"",
-          "expected": "Un bouton de réservation est présent et cliquable pour chaque chambre."
+          "action": "Utiliser le token reçu dans l'en-tête Authorization: Bearer <token> et appeler GET /api/room",
+          "expected": "Réponse 200 avec un tableau contenant exactement 3 objets, chaque objet possède les champs \"roomid\", \"roomName\", \"type\" et \"price\" correspondant aux valeurs attendues (101/Single/100, 102/Double/150, 103/Suite/225)"
         }
       ]
     },
     {
       "id": "TC-002-02",
       "requirement_id": "REQ-002",
-      "title": "Absence du prix pour une chambre (cas négatif)",
-      "type": "negative",
+      "title": "Affichage de la liste des chambres sur la page d'accueil UI",
+      "type": "nominal",
       "layer": "UI",
       "priority": "Haute",
       "preconditions": [
-        "L'utilisateur a ouvert le navigateur et a accédé à la page d'accueil du site où une chambre a été configurée sans prix dans la base de données."
+        "L'utilisateur est authentifié et possède un token valide"
       ],
       "steps": [
         {
-          "action": "Charger la page d'accueil",
-          "expected": "La liste des chambres s'affiche."
+          "action": "Ouvrir la page d'accueil du site web",
+          "expected": "La page charge et déclenche un appel GET /api/room avec le token"
         },
         {
-          "action": "Identifier la chambre dont le prix est manquant",
-          "expected": "Le champ \"prix\" n'est pas présent pour cette chambre."
+          "action": "Vérifier que la section \"Liste des chambres\" affiche trois cartes",
+          "expected": "Chaque carte montre le type (Single, Double, Suite) et le prix (100, 150, 225) correspondant aux données de l'API"
         },
         {
-          "action": "Vérifier que le système signale une anomalie ou masque la chambre",
-          "expected": "Un message d'erreur ou une indication de donnée manquante est affiché, ou la chambre n'est pas présentée dans la liste."
+          "action": "Pour chaque carte, vérifier la présence d'un bouton \"Réserver\"",
+          "expected": "Le bouton est visible, activable et porte le libellé \"Réserver\""
+        }
+      ]
+    },
+    {
+      "id": "TC-002-03",
+      "requirement_id": "REQ-002",
+      "title": "Tentative d'accès à la liste des chambres sans authentification",
+      "type": "negative",
+      "layer": "API",
+      "priority": "Haute",
+      "preconditions": [],
+      "steps": [
+        {
+          "action": "Envoyer une requête GET /api/room sans l'en-tête Authorization",
+          "expected": "Réponse 401 avec le corps JSON {\"error\":\"Invalid credentials\"}"
         }
       ]
     }
