@@ -74,16 +74,19 @@ jobs:
         if: always()
         run: make defects
 
+      - name: Importer les résultats (FileBackend)
+        if: always()
+        run: make push
+
+      - name: Rapport de synthèse
+        if: always()
+        run: |
+          make report
+          cat reports/report.md >> "$GITHUB_STEP_SUMMARY"
+
       - name: Logs Docker en cas d'échec
         if: failure()
         run: docker compose logs --tail=100
-
-      - name: Résumé du job
-        if: always()
-        run: |
-          echo "## Résultats QAPilot-AI" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Suite bloquante : reports/junit.xml" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Défauts connus (DEF-001, DEF-002) : reports/junit_defects.xml" >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-artifact@v4
         if: always()
