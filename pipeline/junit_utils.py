@@ -3,6 +3,7 @@ from pathlib import Path
 
 BLOCKING = Path("reports/junit.xml")
 DEFECTS = Path("reports/junit_defects.xml")
+UI = Path("reports/junit_ui.xml")
 
 
 def parse_junit(path: Path, source: str) -> list[dict]:
@@ -36,4 +37,6 @@ def parse_junit(path: Path, source: str) -> list[dict]:
 
 
 def load_all() -> tuple[list[dict], list[dict]]:
-    return parse_junit(BLOCKING, "blocking"), parse_junit(DEFECTS, "defects")
+    """Suite bloquante = API + UI ; défauts connus à part."""
+    blocking = parse_junit(BLOCKING, "blocking") + parse_junit(UI, "blocking")
+    return blocking, parse_junit(DEFECTS, "defects")

@@ -4,7 +4,7 @@ endif
 
 BACKEND ?= file
 
-.PHONY: up down lint cases sync gen-tests run defects push report repro all
+.PHONY: up down lint cases sync gen-tests run run-ui defects push report repro all
 
 up:
 	docker compose up -d --build
@@ -27,9 +27,13 @@ gen-tests:
 	uv run python -m pipeline.gen_tests
 	uv run python -m pipeline.check_tests
 
-# Suite bloquante : tout sauf les tests de défauts connus
+# Suite bloquante API : tout sauf les tests de défauts connus
 run:
 	uv run pytest tests/api tests/gold --ignore-glob="tests/gold/test_def_*" -q -rs --junitxml=reports/junit.xml
+
+# Suite UI Playwright
+run-ui:
+	uv run pytest tests/ui_playwright -q -rs --junitxml=reports/junit_ui.xml
 
 # Défauts connus : rouges volontairement, non bloquants
 defects:
@@ -57,4 +61,4 @@ repro:
 	uv run python -m pipeline.repro snapshot run2
 	uv run python -m pipeline.repro compare run1 run2
 
-all: lint up cases sync gen-tests run defects push report
+all: lint up cases sync gen-tests run run-ui defects push report

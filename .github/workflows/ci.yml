@@ -64,11 +64,18 @@ jobs:
           enable-cache: true
       - run: uv sync --frozen
 
+      - name: Installer Chromium (Playwright)
+        run: uv run playwright install --with-deps chromium
+
       - name: Démarrer l'application
         run: make up
 
-      - name: Suite bloquante (tests/api + gold sans défauts)
+      - name: Suite bloquante API (tests/api + gold sans défauts)
         run: make run
+
+      - name: Suite UI Playwright
+        if: always()
+        run: make run-ui
 
       - name: Défauts connus (non bloquant)
         if: always()
