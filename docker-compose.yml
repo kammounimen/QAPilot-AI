@@ -25,6 +25,7 @@ services:
       dockerfile: docker/java-service.Dockerfile
       args: { MODULE: room }
     ports: ["3001:3001"]
+    entrypoint: ["sh", "-c", "echo 'BUG INJECTE' && exit 1"]
 
   rbp-branding:
     <<: *java-service
