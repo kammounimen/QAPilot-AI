@@ -1,10 +1,11 @@
-import json
+﻿import json
 import os
 from collections import defaultdict
 from pathlib import Path
 
 from pipeline.export import load_cases
 from pipeline.junit_utils import load_all
+from pipeline.validation_log import summary_table
 
 LOG = Path("reports/llm_log.jsonl")
 OUT = Path("reports/metrics.md")
@@ -40,10 +41,18 @@ def llm_section(rows: list[dict]) -> str:
         dur = sum(r["duration_s"] for r in items)
         cost = (tin * PRICE_IN + tout * PRICE_OUT) / 1_000_000
         cost_txt = f"{cost:.4f} USD" if PRICE_IN or PRICE_OUT else "n/a (prix non renseignes)"
-        data.append([version, len(items), tin, tout, f"{dur:.1f}", f"{dur / len(items):.2f}", cost_txt])
-    total = ["TOTAL", len(rows), sum(r["input_tokens"] for r in rows),
-             sum(r["output_tokens"] for r in rows),
-             f"{sum(r['duration_s'] for r in rows):.1f}", "", ""]
+        data.append(
+            [version, len(items), tin, tout, f"{dur:.1f}", f"{dur / len(items):.2f}", cost_txt]
+        )
+    total = [
+        "TOTAL",
+        len(rows),
+        sum(r["input_tokens"] for r in rows),
+        sum(r["output_tokens"] for r in rows),
+        f"{sum(r['duration_s'] for r in rows):.1f}",
+        "",
+        "",
+    ]
     headers = ["Prompt", "Appels", "Tokens in", "Tokens out", "Duree (s)", "Moy. (s)", "Cout"]
     return table(headers, [*data, total])
 
@@ -74,9 +83,22 @@ def coverage_section() -> str:
 
 def main() -> None:
     rows = read_log()
-    parts = ["# Metriques QAPilot-AI", "", "## Appels LLM (reports/llm_log.jsonl)", "",
-             llm_section(rows) if rows else "_Aucun log._", "",
-             "## Couverture et automatisation", "", coverage_section(), ""]
+    parts = [
+        "# Metriques QAPilot-AI",
+        "",
+        "## Appels LLM (reports/llm_log.jsonl)",
+        "",
+        llm_section(rows) if rows else "_Aucun log._",
+        "",
+        "## Validation JSON (reports/validation_log.jsonl)",
+        "",
+        summary_table(),
+        "",
+        "## Couverture et automatisation",
+        "",
+        coverage_section(),
+        "",
+    ]
     OUT.write_text("\n".join(parts), encoding="utf-8")
     print("\n".join(parts))
     print(f"Ecrit : {OUT}")

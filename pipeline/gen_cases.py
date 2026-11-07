@@ -1,4 +1,4 @@
-import json
+﻿import json
 import re
 import time
 from pathlib import Path
@@ -6,6 +6,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from pipeline.llm_client import complete
+from pipeline.validation_log import log_validation
 from schemas.models import CaseList
 
 PROMPT_VERSION = (
@@ -23,7 +24,7 @@ def clean(text: str) -> str:
 def generate(req_id: str, req_text: str) -> CaseList:
     user = f"## Exigence\n{req_text}\n\n## Notes API\n{notes}"
     error = ""
-    for _ in range(3):
+    for attempt in range(1, 4):
         prompt = user if not error else (
             f"{user}\n\nTa réponse précédente était invalide : {error}\n"
             "Corrige et renvoie uniquement le JSON."
@@ -34,9 +35,11 @@ def generate(req_id: str, req_text: str) -> CaseList:
             for i, c in enumerate(cases.cases, 1):
                 c.requirement_id = req_id
                 c.id = f"TC-{req_id[4:]}-{i:02d}"
+            log_validation("cases", req_id, attempt, True)
             return cases
         except (json.JSONDecodeError, ValidationError) as e:
             error = str(e)[:500]
+            log_validation("cases", req_id, attempt, False, error)
     raise RuntimeError(f"{req_id} : échec après 3 essais ({error})")
 
 
