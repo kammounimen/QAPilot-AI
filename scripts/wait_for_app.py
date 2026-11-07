@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 url = os.environ.get("BASE_URL", "http://localhost:8080")
 
-for i in range(1, 61):
+for i in range(1, 121):
     try:
         urllib.request.urlopen(url, timeout=5)
         print(f"App prête : {url}")
