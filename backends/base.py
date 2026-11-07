@@ -19,3 +19,4 @@ class TestManagementBackend(ABC):
     @abstractmethod
     def import_results(self, results: list[dict]) -> str:
         """Importe les résultats d'exécution, retourne un identifiant d'exécution."""
+        
