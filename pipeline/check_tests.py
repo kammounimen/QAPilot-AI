@@ -23,7 +23,7 @@ for f in files:
         errors.append(f"{f.name} : assert un code 5xx (aligné sur un défaut ?)")
 
 if files:
-    r = subprocess.run([sys.executable, "-m", "ruff", "check", "tests/api"])
+    r = subprocess.run([sys.executable, "-m", "ruff", "check", "tests/api"], check=False)
     if r.returncode:
         errors.append("ruff a signalé des erreurs")
 

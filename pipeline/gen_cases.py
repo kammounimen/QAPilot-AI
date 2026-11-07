@@ -8,7 +8,9 @@ from pydantic import ValidationError
 from pipeline.llm_client import complete
 from schemas.models import CaseList
 
-PROMPT_VERSION = "v1"
+PROMPT_VERSION = (
+    "v2" if Path("prompts/v2/gen_cases.md").exists() else "v1"
+)
 SYSTEM = Path(f"prompts/{PROMPT_VERSION}/gen_cases.md").read_text(encoding="utf-8")
 API_NOTES = Path("spec/api_notes.md")
 notes = API_NOTES.read_text(encoding="utf-8") if API_NOTES.exists() else "(aucune note)"

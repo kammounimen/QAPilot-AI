@@ -4,7 +4,7 @@ endif
 
 BACKEND ?= file
 
-.PHONY: up down lint cases sync tests run push report all
+.PHONY: up down lint cases sync gen-tests run defects push report all
 
 up:
 	docker compose up -d --build
@@ -23,12 +23,17 @@ cases:
 sync:
 	uv run python -m pipeline.export --backend $(BACKEND)
 
-tests:
+gen-tests:
 	uv run python -m pipeline.gen_tests
 	uv run python -m pipeline.check_tests
 
+# Suite bloquante : tout sauf les tests de défauts connus
 run:
-	uv run pytest tests/api tests/ui_playwright tests/ui_selenium --junitxml=reports/junit.xml
+	uv run pytest tests/api tests/gold --ignore-glob="tests/gold/test_def_*" -q -rs --junitxml=reports/junit.xml
+
+# Défauts connus : rouges volontairement, non bloquants (le "-" ignore l'échec)
+defects:
+	-uv run pytest tests/gold/test_def_001.py tests/gold/test_def_002.py -q --junitxml=reports/junit_defects.xml
 
 push:
 	uv run python -m pipeline.push_results --backend $(BACKEND)
@@ -36,11 +41,4 @@ push:
 report:
 	uv run python -m pipeline.report
 
-all: up cases sync tests run push report
-
-gen-tests:
-	uv run python -m pipeline.gen_tests
-	uv run python -m pipeline.check_tests
-
-run:
-	uv run pytest tests/api tests/gold
+all: lint up cases sync gen-tests run defects push report

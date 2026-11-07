@@ -3,8 +3,8 @@ import os
 import pytest
 import requests
 from dotenv import load_dotenv
-
 from known_gaps import INCONSISTENT_CASES, REASON
+
 load_dotenv()
 
 

@@ -19,7 +19,7 @@ OUT = Path("tests/api")
 
 
 def extract_code(raw: str) -> str:
-    m = re.search(r"```(?:python)?\s*\n(.*?)```", raw, re.S)
+    m = re.search(r"```(?:python)?\s*\n(.*?)```", raw, re.DOTALL)
     return (m.group(1) if m else raw).strip() + "\n"
 
 
