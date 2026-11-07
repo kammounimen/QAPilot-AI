@@ -1,22 +1,39 @@
+import json
 import os
 import sys
 import time
 import urllib.error
 import urllib.request
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
 
-load_dotenv()
-url = os.environ.get("BASE_URL", "http://localhost:8080")
+    load_dotenv()
+except ImportError:
+    pass
 
-for i in range(1, 121):
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8080")
+MAX_ATTEMPTS = 120
+DELAY = 5
+
+payload = json.dumps({"username": "admin", "password": "password"}).encode()
+
+for i in range(1, MAX_ATTEMPTS + 1):
+    req = urllib.request.Request(
+        f"{BASE_URL}/api/auth/login",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
     try:
-        urllib.request.urlopen(url, timeout=5)
-        print(f"App prête : {url}")
-        sys.exit(0)
-    except (urllib.error.URLError, ConnectionError, TimeoutError):
-        print(f"Attente de l'application ({i}/60)...")
-        time.sleep(5)
+        with urllib.request.urlopen(req, timeout=30) as r:
+            if r.status == 200:
+                print(f"App prête : {BASE_URL} (login OK, tentative {i})")
+                sys.exit(0)
+    except (urllib.error.URLError, ConnectionError, TimeoutError, OSError):
+        pass
+    print(f"Attente de l'application ({i}/{MAX_ATTEMPTS})...")
+    time.sleep(DELAY)
 
-print("L'application n'a pas démarré", file=sys.stderr)
+print("Application non prête : délai dépassé")
 sys.exit(1)
