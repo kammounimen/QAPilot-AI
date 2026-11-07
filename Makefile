@@ -4,7 +4,7 @@ endif
 
 BACKEND ?= file
 
-.PHONY: up down lint cases sync gen-tests run run-ui defects push report repro all
+.PHONY: up down lint cases sync gen-tests run run-ui defects push report repro all regen
 
 up:
 	docker compose up -d --build
@@ -61,4 +61,7 @@ repro:
 	uv run python -m pipeline.repro snapshot run2
 	uv run python -m pipeline.repro compare run1 run2
 
-all: lint up cases sync gen-tests run run-ui defects push report
+all: lint up sync run run-ui defects push report
+
+# Régénération avec le LLM : consomme le quota Groq et réécrit cases/ et tests/api/
+regen: cases gen-tests

@@ -1,133 +1,129 @@
 # QAPilot-AI
 
-Pipeline de génération de tests API assistée par LLM, appliqué à l'application de réservation d'hôtel
-*Restful Booker Platform* (lancée via Docker Compose).
+Pipeline QA complet piloté par IA, appliqué à *Restful Booker Platform* (application de réservation d'hôtel lancée via Docker Compose).
 
-Le principe : **exigences → cas de test → tests pytest**, avec des garde-fous pour vérifier que les tests
-générés ne valident pas par erreur un comportement défectueux.
+Chaîne de bout en bout : **exigences → cas de test (LLM) → export vers un outil de gestion → tests automatisés (API + UI) → CI → rapport de synthèse**, avec des garde-fous pour que les tests générés ne valident pas un comportement défectueux.
 
-## Chaîne de traitement
+## Architecture
 
+```mermaid
+flowchart LR
+    R[requirements/REQ-xxx.md] -->|gen_cases + LLM| C[cases/REQ-xxx.json]
+    N[spec/api_notes.md + prompts/] --> C
+    C -->|export| M[(FileBackend / mapping.json)]
+    C -->|gen_tests + LLM| T[tests/api]
+    G[tests/gold + tests/ui_playwright] --> X
+    T --> X[pytest]
+    X -->|JUnit XML| P[push_results]
+    P --> M
+    X -->|JUnit XML| REP[report.md / report.html]
+    CI[GitHub Actions] -. orchestre .-> X
 ```
-requirements/REQ-xxx.md  ──gen_cases──▶  cases/REQ-xxx.json  ──gen_tests──▶  tests/api/test_tc_*.py
-        (exigences)                       (cas de test, ne pas modifier)        (tests générés)
-                                                    ▲
-                              spec/api_notes.md + prompts/<version>/
-```
 
-| Étape | Fichier | Rôle |
+| Étape | Module | Rôle |
 |---|---|---|
-| Génération des cas | `pipeline/gen_cases.py` | Produit `cases/REQ-*.json` à partir des exigences |
-| Contrôle des cas | `pipeline/check_cases.py` | Valide la structure des cas |
-| Génération des tests | `pipeline/gen_tests.py` | Produit un fichier pytest par cas dans `tests/api/` |
-| Contrôle des tests | `pipeline/check_tests.py` | Garde-fous sur les tests générés (voir plus bas) |
-| Client LLM | `pipeline/llm_client.py` | Appel à Groq (modèle `openai/gpt-oss-120b`), avec cache dans `.cache/llm/` |
+| Génération des cas | `pipeline/gen_cases.py` | Un appel LLM par exigence, validation Pydantic, 3 essais max |
+| Contrôle des cas | `pipeline/check_cases.py` | Structure, un cas nominal et un négatif par exigence |
+| Export | `pipeline/export.py`, `backends/` | Interface `TestManagementBackend`, `FileBackend`, idempotence, `mapping.json` |
+| Génération des tests | `pipeline/gen_tests.py` | Un fichier pytest par cas API |
+| Contrôle des tests | `pipeline/check_tests.py` | Compilation, marqueur `tc`, ruff, pas de `sleep`, pas d'assert sur 5xx |
+| Résultats | `pipeline/push_results.py` | Fusion des JUnit, import dans le backend |
+| Rapport | `pipeline/report.py` | Taux, matrice REQ → TC → test → résultat, défauts |
+| Métriques | `pipeline/metrics.py` | Appels LLM, tokens, durées, couverture |
+| Reproductibilité | `pipeline/repro.py` | Empreintes SHA-256 de deux exécutions et comparaison |
 
-## Structure du projet
-
-```
-cases/              Cas de test générés (jamais modifiés à la main)
-requirements/       Exigences REQ-xxx.md
-spec/api_notes.md   Notes sur l'API : endpoints, données, comportements ATTENDUS et OBSERVÉS
-prompts/v1, v2      Prompts du générateur de tests (v2 = version actuelle)
-pipeline/           Scripts de génération et de contrôle
-tests/api/          Tests générés (ne pas modifier à la main)
-tests/gold/         Tests écrits à la main (défauts connus, couverture manquante)
-tests/conftest.py   Fixtures base_url, admin_token + hook xfail
-tests/known_gaps.py Liste des cas générés incohérents avec les exigences
-defects.md          Registre des défauts
-```
+Tous les chiffres du rapport sont calculés en Python, jamais par le LLM.
 
 ## Prérequis
 
-- Python et [uv](https://docs.astral.sh/uv/)
+- Python 3.12 et [uv](https://docs.astral.sh/uv/)
 - Docker Desktop
-- Un fichier `.env` avec la clé Groq (ne jamais le commiter)
-- Optionnel : `BASE_URL` (par défaut `http://localhost:8080`)
+- Make
+- Une clé Groq, uniquement pour régénérer les cas ou les tests
 
-## Utilisation
+## Démarrage rapide (rejeu, sans clé LLM)
 
-```powershell
-# 1. Lancer l'application (démarrage lent : environ 70 s pour le service auth)
-docker compose up -d
-
-# 2. Générer les tests (consomme des tokens Groq)
-uv run python -m pipeline.gen_tests
-
-# 3. Contrôler
-uv run ruff check --fix tests/api
-uv run python -m compileall -q tests
-uv run python -m pipeline.check_tests
-
-# 4. Exécuter
-uv run pytest tests/api tests/gold -q -rs
+```bash
+git clone --recurse-submodules <ton-depot>
+cd QAPilot-AI
+cp .env.example .env
+uv sync
+uv run playwright install chromium
+make all
 ```
 
-## Résultat actuel
+`make all` rejoue le pipeline à partir des cas et tests commités : lint, démarrage de l'application (environ 70 s pour le service auth), export, tests API, tests UI, défauts connus, import des résultats, rapport. Sortie : `reports/report.md` et `reports/report.html`.
+
+Pour régénérer avec le LLM (consomme le quota Groq et réécrit `cases/` et `tests/api/`) :
+
+```bash
+make regen
+```
+
+## Commandes
+
+| Commande | Effet |
+|---|---|
+| `make up` / `make down` | Démarre (avec attente du login réel) / arrête l'application |
+| `make sync` | Exporte les cas (idempotent) |
+| `make run` | Suite bloquante API (`tests/api` + `tests/gold` sans défauts) |
+| `make run-ui` | Suite UI Playwright |
+| `make defects` | Tests de défauts connus, rouges volontairement, non bloquants |
+| `make push` | Importe les résultats dans le backend |
+| `make report` | Génère `report.md` et `report.html` |
+| `make repro` | Deux exécutions complètes puis comparaison des empreintes |
+| `make regen` | Régénère cas et tests avec le LLM |
+
+## Structure
 
 ```
-3 failed, 14 passed, 3 xfailed
+requirements/       Exigences REQ-001 à REQ-012
+cases/              Cas générés (35), ne jamais modifier à la main
+tests/api/          Tests API générés (ne pas modifier à la main)
+tests/gold/         Tests écrits à la main (défauts connus, couverture manquante)
+tests/ui_playwright/ Tests UI Playwright (5)
+tests/known_gaps.py Cas générés incohérents avec les exigences (xfail)
+spec/               Notes d'API, défauts
+prompts/v1, v2      Prompts versionnés
+backends/           Interface et FileBackend
+pipeline/           Génération, contrôle, export, rapport, métriques
+.github/workflows/  CI
 ```
 
-| Résultat | Tests | Signification |
-|---|---|---|
-| 3 failed | `tests/gold/test_def_001.py`, `test_def_002.py` | Vrais défauts de l'application (DEF-001, DEF-002), rouges volontairement |
-| 3 xfailed | TC-002-03, TC-012-01, TC-012-02 | Cas générés incohérents avec les exigences (voir ci-dessous) |
-| 14 passed | le reste | Relus : données correctes, aucun assert aligné sur un défaut |
+## CI (GitHub Actions)
 
-## Défauts détectés
+Jobs : `lint` → `export` (deux passages, vérification de l'absence de doublon) et `test-api` (application Docker, API, UI Playwright, défauts, import, rapport dans le résumé du job). Artefacts : `api-results`, `export-results`. Permissions minimales, `concurrency`, cache uv.
 
-Détail dans `defects.md`.
+## Résultats actuels
 
-| ID | Endpoint | Attendu | Observé | Gravité | Tests |
-|---|---|---|---|---|---|
-| DEF-001 | `POST /api/auth/login` avec JSON invalide | 400 | 500 | Mineure | TC-001-04 |
-| DEF-002 | `GET /api/message` sans jeton ou avec jeton invalide | 401 ou 403 (REQ-012) | 200 + liste des messages | Moyenne à haute | TC-012-02b, TC-012-03b |
-
-Autres constats : Swagger (`/swagger-ui.html`, `/v3/api-docs`) activé sous le profil `prod`, identifiants par
-défaut `admin` / `password`, format d'erreur incohérent entre `/api/auth/login` (`error`) et `/api/room` (`errors`).
-
-## Écarts de génération (pas des défauts de l'application)
-
-TC-002-03, TC-012-01 et TC-012-02 attendent 401/403 sur `GET /api/room`. Or REQ-002 décrit une liste de chambres
-visible par un visiteur (donc publique), et REQ-012 ne protège que la création, la modification et la suppression
-de chambres ainsi que la lecture des messages. Ces cas sont une erreur de `gen_cases`. Ils sont marqués `xfail`
-via `tests/known_gaps.py`, sans toucher aux fichiers générés.
+- 12 exigences, 35 cas (13 API, 22 UI)
+- Cas automatisés : 16 / 35 (API 13 / 13, UI 3 / 22)
+- Suite bloquante : 19 réussis, 3 xfail, 0 échec ; UI : 5 réussis
+- 2 défauts applicatifs réels, 3 tests rouges volontaires (voir `spec/defects.md`) :
+  - DEF-001 : `POST /api/auth/login` avec JSON invalide renvoie 500 au lieu de 400
+  - DEF-002 : `GET /api/message` sans jeton renvoie 200 au lieu de 401/403
+- Preuve de détection : branche `bug-injection` (service `room` arrêté), CI rouge
+- Preuve de reproductibilité : `make repro` donne « IDENTIQUE »
 
 ## Règles de travail
 
-1. **Ne jamais modifier `cases/` ni `tests/api/` à la main.** Les décisions vont dans `spec/`, `prompts/`,
-   `tests/known_gaps.py` ou `tests/gold/`.
-2. **Les tests vérifient le comportement attendu par les exigences**, jamais l'observé défectueux.
-   Les défauts connus sont couverts par des tests gold écrits à la main.
-3. **Le comportement attendu du cas fait foi, les données de test viennent des notes API** (identifiants,
-   `roomid`, noms de champs). Voir `prompts/v2/gen_tests_api.md`.
-4. **Un test vert ne prouve rien tant que son `assert` n'a pas été lu.**
-5. **Ne pas régénérer sans raison** : le LLM varie d'un run à l'autre et chaque appel consomme le quota Groq
-   (200 000 tokens par jour). Changer `PROMPT_VERSION` force une régénération sans vider le cache.
+- Ne jamais modifier `cases/` ni `tests/api/` à la main : les décisions vont dans `spec/`, `prompts/`, `tests/known_gaps.py` ou `tests/gold/`.
+- Les tests vérifient le comportement attendu par les exigences, jamais l'observé défectueux.
+- Un test vert ne prouve rien tant que son assert n'a pas été lu.
+- Ne pas régénérer sans raison : le LLM varie d'un run à l'autre et le quota Groq est limité.
 
-## Garde-fous (`pipeline/check_tests.py`)
+## Limites et risques
 
-Pour chaque fichier de `tests/api/` : compilation Python, marqueur `@pytest.mark.tc(...)` présent,
-pas de `time.sleep`, pas d'appel externe, ruff sans erreur, et **aucun assert sur un code 5xx**
-(signe d'un test aligné sur un bug).
+- **Hallucinations** : le LLM a produit des cas incohérents (TC-002-03, TC-012-01, TC-012-02 supposent `GET /api/room` protégé alors qu'il est public). Ils sont marqués xfail, et une relecture humaine reste nécessaire.
+- **Reproductibilité** : elle porte sur le rejeu des artefacts commités. La génération LLM utilise `temperature=0`, un modèle épinglé et un cache par hash, mais le texte exact n'est pas garanti d'un run à l'autre.
+- **Coût et quota** : 172 appels, environ 247 000 tokens en entrée et 101 000 en sortie sur l'historique, avec un quota quotidien Groq limité. Le coût n'est pas chiffré tant que les prix ne sont pas renseignés.
+- **Données envoyées au LLM** : exigences et notes d'API uniquement, aucun secret ni donnée personnelle.
+- **Couverture UI limitée** : 3 cas sur 22 automatisés. Les tests UI actuels viennent de Playwright codegen puis d'un nettoyage manuel, pas de la génération LLM.
+- **Instabilité UI** : sélecteurs `data-testid`, mais le test d'envoi de contact crée de vrais messages dans l'application.
+- **Outil de gestion de tests** : seul le `FileBackend` est implémenté et testé. Xray n'est pas branché.
+- **Métrique « JSON valide au 1er essai »** : journalisée seulement depuis l'ajout de `validation_log`. L'historique antérieur n'est pas rejouable.
+- **Taux de réussite de 100 %** : il exclut les 3 xfail et les défauts connus, suivis à part.
 
-## Problèmes rencontrés et enseignements
+## Perspectives
 
-| Problème | Cause | Solution |
-|---|---|---|
-| Tests skippés « endpoint non documenté » | Cas ambigus et spec contradictoire | Spec consolidée, une section par endpoint |
-| Tests verts mais faux (`GET /api/room` → 200) | Le modèle alignait le test sur les notes | Règle v2 : l'attendu du cas fait foi |
-| Faux rouges (mauvais mot de passe, `roomid` 101) | Données inventées dans les cas recopiées | Règle v2 : données issues des notes |
-| TC-001-04 asserté `== 500` | Le modèle a pris l'observé pour l'attendu | Test gold à la main + garde-fou 5xx |
-| Fichier généré avec docstring non fermé | Variabilité du LLM | `compileall` + interdiction des docstrings dans le prompt |
-| Erreur 429 Groq | Quota quotidien de tokens atteint | Changer de modèle, attendre, ne régénérer que si nécessaire |
-
-## À faire
-
-- Ajouter au prompt de `gen_cases` la règle « pas de cas 401/403 sur un endpoint public », régénérer les cas,
-  puis vider `tests/known_gaps.py`.
-- Couvrir la modification et la suppression de chambre (REQ-012, critère 1) une fois l'URL réelle relevée
-  (`/api/room/<id>` renvoie 500 via le port 8080).
-- Compléter la spec de `GET /api/branding`.
-- Décider du sort de DEF-001 et DEF-002 avec l'équipe de l'application.
+XrayBackend et ZephyrBackend, génération LLM des tests UI à partir des tests gold Playwright, Selenium (smoke), Jenkins, BDD, OpenTelemetry.
