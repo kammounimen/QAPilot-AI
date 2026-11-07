@@ -1,4 +1,4 @@
-import os
+﻿import os
 
 import pytest
 import requests
@@ -22,6 +22,14 @@ def admin_token(base_url):
     )
     assert r.status_code == 200
     return r.json()["token"]
+
+
+@pytest.fixture(autouse=True)
+def _record_tc_id(request, record_property):
+    """Écrit le TC-ID du marqueur @pytest.mark.tc dans le JUnit XML."""
+    marker = request.node.get_closest_marker("tc")
+    if marker and marker.args:
+        record_property("tc", marker.args[0])
 
 
 def pytest_collection_modifyitems(config, items):
