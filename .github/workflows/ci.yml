@@ -23,6 +23,34 @@ jobs:
       - run: uv run python -m pipeline.check_cases
       - run: uv run python -m pipeline.check_tests
 
+  export:
+    runs-on: ubuntu-latest
+    needs: lint
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+
+      - name: Export des cas (1er passage)
+        run: make sync
+
+      - name: Export des cas (2e passage, preuve d'idempotence)
+        run: make sync
+
+      - name: Vérifier l'absence de doublon
+        run: test "$(ls reports/xray_mock/tests | wc -l)" -eq 35
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: export-results
+          path: |
+            mapping.json
+            reports/xray_mock/
+
   test-api:
     runs-on: ubuntu-latest
     needs: lint
