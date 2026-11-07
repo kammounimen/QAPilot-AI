@@ -4,7 +4,7 @@ endif
 
 BACKEND ?= file
 
-.PHONY: up down lint cases sync gen-tests run defects push report all
+.PHONY: up down lint cases sync gen-tests run defects push report repro all
 
 up:
 	docker compose up -d --build
@@ -31,7 +31,7 @@ gen-tests:
 run:
 	uv run pytest tests/api tests/gold --ignore-glob="tests/gold/test_def_*" -q -rs --junitxml=reports/junit.xml
 
-# Défauts connus : rouges volontairement, non bloquants (le "-" ignore l'échec)
+# Défauts connus : rouges volontairement, non bloquants
 defects:
 	-uv run pytest tests/gold/test_def_001.py tests/gold/test_def_002.py -q --junitxml=reports/junit_defects.xml
 
@@ -40,5 +40,21 @@ push:
 
 report:
 	uv run python -m pipeline.report
+
+# Preuve de reproductibilité : deux exécutions, puis comparaison des empreintes
+repro:
+	$(MAKE) sync
+	$(MAKE) run
+	$(MAKE) defects
+	$(MAKE) push
+	$(MAKE) report
+	uv run python -m pipeline.repro snapshot run1
+	$(MAKE) sync
+	$(MAKE) run
+	$(MAKE) defects
+	$(MAKE) push
+	$(MAKE) report
+	uv run python -m pipeline.repro snapshot run2
+	uv run python -m pipeline.repro compare run1 run2
 
 all: lint up cases sync gen-tests run defects push report

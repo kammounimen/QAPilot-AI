@@ -26,6 +26,7 @@ build-backend = "uv_build"
 [tool.pytest.ini_options]
 markers = ["tc(id): identifiant du cas de test (traçabilité)"]
 testpaths = ["tests"]
+junit_family = "xunit1"
 
 [tool.ruff]
 line-length = 100
