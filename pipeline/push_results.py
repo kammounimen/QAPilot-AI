@@ -1,11 +1,8 @@
 ﻿import argparse
 import json
-from pathlib import Path
 
-from pipeline.export import get_backend
+from pipeline.export import get_backend, mapping_path
 from pipeline.junit_utils import load_all
-
-MAPPING = Path("mapping.json")
 
 
 def main() -> None:
@@ -14,24 +11,22 @@ def main() -> None:
     args = ap.parse_args()
 
     backend = get_backend(args.backend)
-    mapping = (
-        json.loads(MAPPING.read_text(encoding="utf-8")) if MAPPING.exists() else {}
-    )
+    path = mapping_path(args.backend)
+    mapping = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     blocking, defects = load_all()
 
-    results = []
-    for t in blocking + defects:
-        results.append(
-            {
-                "tc_id": t["tc"],
-                "key": mapping.get(t["tc"]),
-                "test": t["test"],
-                "status": t["status"],
-                "duration": t["duration"],
-                "message": t["message"],
-                "source": t["source"],
-            }
-        )
+    results = [
+        {
+            "tc_id": t["tc"],
+            "key": mapping.get(t["tc"]),
+            "test": t["test"],
+            "status": t["status"],
+            "duration": t["duration"],
+            "message": t["message"],
+            "source": t["source"],
+        }
+        for t in blocking + defects
+    ]
     execution_id = backend.import_results(results)
     print(f"Résultats importés ({args.backend}) : {len(results)} tests -> {execution_id}")
 

@@ -31,7 +31,7 @@ def call(url, headers=None, data=None):
             return resp.status, resp.read().decode()
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode()[:300]
-    except Exception as e:  # réseau, DNS, proxy...
+    except (urllib.error.URLError, TimeoutError, OSError) as e:  # réseau, DNS, proxy...
         return None, str(e)
 
 
